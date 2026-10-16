@@ -1,0 +1,58 @@
+import { describe, it, expect, vi } from "vitest";
+import React from "react";
+import { render } from "@testing-library/react";
+
+vi.mock("framer-motion", () => {
+  const createMotion = (tag: string) => {
+    const MotionComponent = ({ children, ...props }: any) => {
+      const {
+        variants,
+        initial,
+        animate,
+        transition,
+        whileHover,
+        whileTap,
+        whileFocus,
+        whileDrag,
+        drag,
+        dragConstraints,
+        exit,
+        layout,
+        layoutId,
+        ...domProps
+      } = props;
+      return React.createElement(tag, domProps, children);
+    };
+    MotionComponent.displayName = `motion.${tag}`;
+    return MotionComponent;
+  };
+  return {
+    motion: {
+      div: createMotion("div"),
+      span: createMotion("span"),
+      h1: createMotion("h1"),
+      p: createMotion("p"),
+      a: createMotion("a"),
+      img: createMotion("img"),
+    },
+    useScroll: () => ({ scrollY: 0 }),
+    useTransform: (_: any, __: any, output: any) => output[0],
+    useSpring: (val: any) => val,
+    useMotionValue: () => ({ set: () => {} }),
+    useInView: () => true,
+  };
+});
+
+vi.mock("lucide-react", () => ({
+  ArrowRight: () => React.createElement("span", { "data-testid": "arrow-right" }),
+  ChevronDown: () => React.createElement("span", { "data-testid": "chevron-down" }),
+}));
+
+import { HeroSection } from "../hero";
+
+describe("HeroSection", () => {
+  it("renders without crashing", () => {
+    const { container } = render(<HeroSection />);
+    expect(container).toBeDefined();
+  });
+});

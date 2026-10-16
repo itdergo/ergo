@@ -1,0 +1,55 @@
+{
+  "siteUrl": "https://ergo.com.ph",
+  "defaultOgImage": "/images/hero-chairs.jpg",
+  "routes": [
+    {
+      "path": "/",
+      "title": "ERGO Contracts Philippines | Ergonomic Furniture & Workplace Solutions",
+      "description": "ERGO Contracts Philippines designs, manufactures and installs ergonomic seating, systems furniture, desking and storage for offices, institutions and homes across the Philippines and SEA.",
+      "changefreq": "weekly",
+      "priority": "1.0"
+    },
+    {
+      "path": "/products",
+      "title": "Office Furniture & Ergonomic Seating | ERGO Contracts Philippines",
+      "description": "Browse ERGO's full furniture range: ergonomic seating, conference and executive desking, modular workstation systems, filing and storage, arena and cinema seating.",
+      "changefreq": "weekly",
+      "priority": "0.9"
+    },
+    {
+      "path": "/solutions",
+      "title": "End-to-End Workplace Solutions | ERGO Contracts Philippines",
+      "description": "Space planning and design, project management, delivery and installation, and after-sales support — ERGO partners with you from concept to a fully installed space.",
+      "changefreq": "monthly",
+      "priority": "0.8"
+    },
+    {
+      "path": "/industries",
+      "title": "Industries We Serve | ERGO Contracts Philippines",
+      "description": "ERGO furnishes academe, arenas and stadiums, banks and finance, BPO and technology, cinemas, corporate offices, government and semiconductor facilities.",
+      "changefreq": "monthly",
+      "priority": "0.8"
+    },
+    {
+      "path": "/projects",
+      "title": "Featured Installations & Projects | ERGO Contracts Philippines",
+      "description": "A selection of recent ERGO furniture installations across the Philippines, from corporate headquarters and universities to arenas and government facilities.",
+      "changefreq": "monthly",
+      "priority": "0.7"
+    },
+    {
+      "path": "/resources",
+      "title": "Catalogues & Product Specifications | ERGO Contracts Philippines",
+      "description": "Download ERGO product catalogues, series specifications and warranty information for seating, desking, systems furniture and storage.",
+      "changefreq": "monthly",
+      "priority": "0.6"
+    },
+    {
+      "path": "/contact",
+      "title": "Request a Consultation | ERGO Contracts Philippines",
+      "description": "Contact ERGO Contracts Philippines in Makati City for a workplace consultation, product quote or showroom visit. We respond within 24 hours.",
+      "changefreq": "yearly",
+      "priority": "0.7"
+    }
+  ]
+}

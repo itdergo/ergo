@@ -1,0 +1,9 @@
+node_modules
+dist
+build
+*.tsbuildinfo
+frontend/public/images
+shared/api-zod/src/generated
+shared/api-client-react/src/generated
+package-lock.json
+frontend/clone-data

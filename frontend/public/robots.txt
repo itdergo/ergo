@@ -1,0 +1,16 @@
+# ERGO Contracts Philippines — robots.txt
+User-agent: *
+Allow: /
+
+# Disallow admin/private areas
+Disallow: /admin
+Disallow: /api/
+
+# Crawl-delay courtesy for aggressive bots
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: SemrushBot
+Crawl-delay: 10
+
+Sitemap: https://ergo.com.ph/sitemap.xml
