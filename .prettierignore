@@ -2,6 +2,8 @@ node_modules
 dist
 build
 *.tsbuildinfo
+playwright-report
+test-results
 frontend/public/images
 shared/api-zod/src/generated
 shared/api-client-react/src/generated

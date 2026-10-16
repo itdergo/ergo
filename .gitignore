@@ -8,6 +8,10 @@ out-tsc
 .expo
 .expo-shared
 
+# Playwright test artifacts
+playwright-report/
+test-results/
+
 # dependencies
 node_modules
 

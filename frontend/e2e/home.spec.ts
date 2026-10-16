@@ -31,10 +31,12 @@ test.describe("Home Page", () => {
     // Brand logo should be present
     await expect(header.locator(".brand-logo")).toBeVisible();
 
-    // Key nav links should be present
-    await expect(header.locator("nav >> text=Home")).toBeVisible();
-    await expect(header.locator("nav >> text=Products")).toBeVisible();
-    await expect(header.locator("nav >> text=Contact")).toBeVisible();
+    // Key nav items should be present (exact match — a loose `text=Home` also
+    // matches "Residential & Home Office" in the Products dropdown).
+    const nav = header.locator("nav");
+    await expect(nav.getByText("Home", { exact: true })).toBeVisible();
+    await expect(nav.getByText("Products", { exact: true })).toBeVisible();
+    await expect(nav.getByText("Contact", { exact: true })).toBeVisible();
   });
 
   test("renders footer", async ({ page }) => {

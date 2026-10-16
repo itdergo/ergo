@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
@@ -19,10 +20,22 @@ export default defineConfig({
       use: { browserName: "chromium" },
     },
   ],
-  webServer: {
-    command: "npm run dev",
-    url: "http://localhost:3000",
-    reuseExistingServer: true,
-    timeout: 60_000,
-  },
+  webServer: [
+    {
+      // Express API. The frontend proxies /api to it, and every data-driven
+      // section (products, industries, solutions, nav categories) needs it —
+      // without it the Vite proxy returns ECONNREFUSED and the specs see no data.
+      command: "npm run dev:api",
+      cwd: "..",
+      url: "http://localhost:5000/api/healthz",
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000,
+    },
+    {
+      command: "npm run dev",
+      url: "http://localhost:3000",
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000,
+    },
+  ],
 });
