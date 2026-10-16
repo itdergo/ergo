@@ -89,14 +89,22 @@ export default [
       "no-undef": "off",
       "no-unused-vars": "off",
       // Warn on unused vars but allow underscore-prefixed (intentionally unused)
-      "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      ],
       "@typescript-eslint/no-explicit-any": "warn",
       "no-console": "off",
     },
   },
   {
     // Node-only packages — adds Node.js-specific globals (Buffer, __dirname, require, etc.)
-    files: ["backend/**/*.{ts,tsx}", "database/**/*.{ts,tsx}", "scripts/**/*.{ts,tsx}", "shared/**/*.{ts,tsx}"],
+    files: [
+      "backend/**/*.{ts,tsx}",
+      "database/**/*.{ts,tsx}",
+      "scripts/**/*.{ts,tsx}",
+      "shared/**/*.{ts,tsx}",
+    ],
     languageOptions: {
       globals: {
         Buffer: "readonly",

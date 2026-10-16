@@ -4,15 +4,15 @@ A full-stack product catalog and marketing website for ERGO, built as an npm wor
 
 ## Stack
 
-| Layer      | Tech                                                        |
-| ---------- | ----------------------------------------------------------- |
+| Layer      | Tech                                                              |
+| ---------- | ----------------------------------------------------------------- |
 | Frontend   | React 18, Vite, TypeScript, TailwindCSS, shadcn/ui, Framer Motion |
-| Backend    | Node.js, Express, TypeScript, ESM                           |
-| Database   | PostgreSQL, Drizzle ORM                                     |
-| Auth       | JWT (jsonwebtoken), bcrypt password hashing                |
-| Cache      | Redis (ioredis) — rate limiting + response cache            |
-| Validation | Zod (shared schemas, code-generated API client)            |
-| Build      | esbuild (custom build.mjs for backend), Vite (frontend)    |
+| Backend    | Node.js, Express, TypeScript, ESM                                 |
+| Database   | PostgreSQL, Drizzle ORM                                           |
+| Auth       | JWT (jsonwebtoken), bcrypt password hashing                       |
+| Cache      | Redis (ioredis) — rate limiting + response cache                  |
+| Validation | Zod (shared schemas, code-generated API client)                   |
+| Build      | esbuild (custom build.mjs for backend), Vite (frontend)           |
 
 ## Workspace Map
 
@@ -65,18 +65,19 @@ Browser → Vite dev server (:3000) → /api/* proxy → Express API (:5000)
 
 ## Scripts (root package.json)
 
-| Command           | Action                                              |
-| ----------------- | --------------------------------------------------- |
-| `npm run dev`     | concurrently: backend (build + node) + frontend (vite) |
-| `npm run build`   | Build shared → database → backend → frontend        |
-| `npm run seed`    | Seed the database                                   |
-| `npm run lint`    | ESLint                                              |
-| `npm run format`  | Prettier                                            |
-| `npm run typecheck`| TypeScript noEmit check (frontend + backend)       |
+| Command             | Action                                                 |
+| ------------------- | ------------------------------------------------------ |
+| `npm run dev`       | concurrently: backend (build + node) + frontend (vite) |
+| `npm run build`     | Build shared → database → backend → frontend           |
+| `npm run seed`      | Seed the database                                      |
+| `npm run lint`      | ESLint                                                 |
+| `npm run format`    | Prettier                                               |
+| `npm run typecheck` | TypeScript noEmit check (frontend + backend)           |
 
 ## Environment
 
 Backend expects a `.env` file with:
+
 - `PORT` (default 5000)
 - `DATABASE_URL` (PostgreSQL connection string)
 - `REDIS_URL` (Redis connection string)

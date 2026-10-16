@@ -24,13 +24,13 @@ npm run dev
 
 ## Available Scripts
 
-| Script | Description |
-|---|---|
-| `npm run dev` | Start concurrently: `npm run dev:api` + `npm run dev:frontend` |
-| `npm run build` | Full build: `build:libs` + `build:api` + `build:frontend` |
-| `npm run typecheck` | Type-check both frontend and API |
-| `npm run seed` | Seed the database with admin user + categories + products + industries |
-| `npm run db:push` | Push schema to the embedded PGlite database |
+| Script              | Description                                                            |
+| ------------------- | ---------------------------------------------------------------------- |
+| `npm run dev`       | Start concurrently: `npm run dev:api` + `npm run dev:frontend`         |
+| `npm run build`     | Full build: `build:libs` + `build:api` + `build:frontend`              |
+| `npm run typecheck` | Type-check both frontend and API                                       |
+| `npm run seed`      | Seed the database with admin user + categories + products + industries |
+| `npm run db:push`   | Push schema to the embedded PGlite database                            |
 
 ## Environment Variables
 
@@ -65,27 +65,27 @@ ERGOContractsWEBV1/
 
 ## Services
 
-| Service  | Package           | Port |
-|----------|-------------------|------|
-| Frontend | `@ergo/frontend`  | 3000 |
-| Backend  | `@ergo/backend`   | 5000 |
-| Postgres | (external/infra)  | 5432 |
-| Redis    | (optional cache)  | 6379 |
+| Service  | Package          | Port |
+| -------- | ---------------- | ---- |
+| Frontend | `@ergo/frontend` | 3000 |
+| Backend  | `@ergo/backend`  | 5000 |
+| Postgres | (external/infra) | 5432 |
+| Redis    | (optional cache) | 6379 |
 
 Redis is optional — the backend runs without it and uses it for caching when `REDIS_URL` is set.
 
 ## Available Scripts
 
-| Script | Description |
-|---|---|
-| `npm run dev` | Run frontend + backend concurrently |
-| `npm run build` | Build shared → database → backend → frontend |
-| `npm run lint` / `lint:fix` | ESLint (flat config) |
-| `npm run typecheck` | Type-check frontend + backend |
-| `npm run format` | Prettier write |
-| `npm run verify` | lint + typecheck + build (CI gate) |
-| `npm run seed` | Seed the database |
-| `npm run db:push` / `db:generate` | Drizzle schema push / migrations |
+| Script                            | Description                                  |
+| --------------------------------- | -------------------------------------------- |
+| `npm run dev`                     | Run frontend + backend concurrently          |
+| `npm run build`                   | Build shared → database → backend → frontend |
+| `npm run lint` / `lint:fix`       | ESLint (flat config)                         |
+| `npm run typecheck`               | Type-check frontend + backend                |
+| `npm run format`                  | Prettier write                               |
+| `npm run verify`                  | lint + typecheck + build (CI gate)           |
+| `npm run seed`                    | Seed the database                            |
+| `npm run db:push` / `db:generate` | Drizzle schema push / migrations             |
 
 ## Docker
 
@@ -102,22 +102,22 @@ obtained from `POST /api/auth/login`. Public reads (products, categories,
 solutions, industries, resources) are unauthenticated and carry a public
 Cache-Control; inquiries and auth responses are `no-store`.
 
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET /api/healthz` | Health check |
-| `GET /api/categories` | List all categories |
-| `GET /api/products` | List products with pagination/filtering |
-| `GET /api/products/:slug` | Get single product |
-| `POST /api/products` | Create product (admin) |
-| `PUT /api/products/:id` | Update product (admin) |
-| `DELETE /api/products/:id` | Delete product (admin) |
-| `GET /api/industries` | List industries |
-| `GET /api/resources` | List resources |
-| `GET /api/solutions` | List solutions |
-| `GET /api/inquiries` | List inquiries (admin) |
-| `POST /api/inquiries` | Submit inquiry (public) |
-| `PUT /api/inquiries/:id` | Update inquiry status (admin) |
-| `DELETE /api/inquiries/:id` | Delete inquiry (admin) |
+| Method                      | Endpoint                                | Description |
+| --------------------------- | --------------------------------------- | ----------- |
+| `GET /api/healthz`          | Health check                            |
+| `GET /api/categories`       | List all categories                     |
+| `GET /api/products`         | List products with pagination/filtering |
+| `GET /api/products/:slug`   | Get single product                      |
+| `POST /api/products`        | Create product (admin)                  |
+| `PUT /api/products/:id`     | Update product (admin)                  |
+| `DELETE /api/products/:id`  | Delete product (admin)                  |
+| `GET /api/industries`       | List industries                         |
+| `GET /api/resources`        | List resources                          |
+| `GET /api/solutions`        | List solutions                          |
+| `GET /api/inquiries`        | List inquiries (admin)                  |
+| `POST /api/inquiries`       | Submit inquiry (public)                 |
+| `PUT /api/inquiries/:id`    | Update inquiry status (admin)           |
+| `DELETE /api/inquiries/:id` | Delete inquiry (admin)                  |
 
 ## SEO & routing
 
@@ -126,16 +126,16 @@ distinct, indexable URL with its own title, description, canonical and Open Grap
 tags. `src/routes.json` is the single source of truth and drives the app router,
 the sitemap generator and the prerender pass.
 
-| Route | Page |
-|---|---|
-| `/` | Home — full landing page |
-| `/products` | Product index |
+| Route             | Page                                             |
+| ----------------- | ------------------------------------------------ |
+| `/`               | Home — full landing page                         |
+| `/products`       | Product index                                    |
 | `/products/:slug` | Product detail (Product + BreadcrumbList schema) |
-| `/solutions` | Workplace solutions |
-| `/industries` | Industries served |
-| `/projects` | Featured installations |
-| `/resources` | Catalogues & specifications |
-| `/contact` | Consultation request |
+| `/solutions`      | Workplace solutions                              |
+| `/industries`     | Industries served                                |
+| `/projects`       | Featured installations                           |
+| `/resources`      | Catalogues & specifications                      |
+| `/contact`        | Consultation request                             |
 
 The build runs three steps:
 
@@ -168,4 +168,3 @@ The application is designed to run with **PGlite** (embedded PostgreSQL in the b
 ---
 
 Built with modern fullstack practices — TypeScript throughout, API-first with OpenAPI/orval, shadcn-ui components, and proper env hygiene.
-

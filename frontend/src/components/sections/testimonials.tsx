@@ -87,7 +87,10 @@ export function TestimonialsSection() {
               <button
                 key={i}
                 className={`testimonial-dot ${i === currentIndex ? "active" : ""}`}
-                onClick={() => { setDirection(i > currentIndex ? 1 : -1); setCurrentIndex(i); }}
+                onClick={() => {
+                  setDirection(i > currentIndex ? 1 : -1);
+                  setCurrentIndex(i);
+                }}
                 aria-label={`Go to testimonial set ${i + 1}`}
               />
             ))}
@@ -110,7 +113,10 @@ export function TestimonialsSection() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: direction > 0 ? -50 : 50 }}
                     transition={{ duration: 0.4, delay: i * 0.08 }}
-                    onClick={() => { setDirection(1); setCurrentIndex((prev) => prev >= maxIndex ? 0 : prev + 1); }}
+                    onClick={() => {
+                      setDirection(1);
+                      setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
+                    }}
                     style={{ cursor: "pointer" }}
                   >
                     <div className="testimonial-stars">

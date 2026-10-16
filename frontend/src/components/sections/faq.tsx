@@ -276,7 +276,11 @@ export function FaqSection() {
               const isCatExpanded = allOpen || expandedCats.has(ci);
               return (
                 <div className="faq-category" key={cat.title}>
-                  <button className="faq-category-head" onClick={() => toggleCat(ci)} aria-expanded={isCatExpanded}>
+                  <button
+                    className="faq-category-head"
+                    onClick={() => toggleCat(ci)}
+                    aria-expanded={isCatExpanded}
+                  >
                     <div className="faq-category-icon">
                       <Icon size={20} strokeWidth={1.8} />
                     </div>

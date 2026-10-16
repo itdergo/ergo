@@ -8,20 +8,18 @@
  * Usage:  node scripts/gen-sitemap.mjs
  * Env:    API_URL (default http://localhost:5000/api)
  */
-import fs from 'node:fs';
-import path from 'node:path';
+import fs from "node:fs";
+import path from "node:path";
 
 // Resolve paths relative to the frontend directory (parent of scripts/)
-const root = path.resolve(import.meta.dirname, '..');
-const outDir = path.join(root, 'dist/public');
-const API = process.env.API_URL || 'http://localhost:5000/api';
+const root = path.resolve(import.meta.dirname, "..");
+const outDir = path.join(root, "dist/public");
+const API = process.env.API_URL || "http://localhost:5000/api";
 
 // Load route configuration — single source of truth for all site routes
-const routeConfig = JSON.parse(
-  fs.readFileSync(path.join(root, 'src/routes.json'), 'utf8'),
-);
+const routeConfig = JSON.parse(fs.readFileSync(path.join(root, "src/routes.json"), "utf8"));
 // Strip trailing slash from site URL to avoid double-slash in generated URLs
-const siteUrl = routeConfig.siteUrl.replace(/\/$/, '');
+const siteUrl = routeConfig.siteUrl.replace(/\/$/, "");
 // Use today's date as lastmod for all URLs
 const today = new Date().toISOString().slice(0, 10);
 
@@ -50,8 +48,8 @@ for (const p of products) {
   urls.push({
     loc: `${siteUrl}/products/${p.slug}`,
     lastmod: today,
-    changefreq: 'monthly',
-    priority: '0.6',
+    changefreq: "monthly",
+    priority: "0.6",
   });
 }
 
@@ -62,19 +60,19 @@ const xml =
   urls
     .map(
       (u) =>
-        '  <url>\n' +
+        "  <url>\n" +
         `    <loc>${u.loc}</loc>\n` +
         `    <lastmod>${u.lastmod}</lastmod>\n` +
-        (u.changefreq ? `    <changefreq>${u.changefreq}</changefreq>\n` : '') +
-        (u.priority ? `    <priority>${u.priority}</priority>\n` : '') +
-        '  </url>',
+        (u.changefreq ? `    <changefreq>${u.changefreq}</changefreq>\n` : "") +
+        (u.priority ? `    <priority>${u.priority}</priority>\n` : "") +
+        "  </url>",
     )
-    .join('\n') +
-  '\n</urlset>\n';
+    .join("\n") +
+  "\n</urlset>\n";
 
 // Write the sitemap to dist/public (create directory if needed)
 fs.mkdirSync(outDir, { recursive: true });
-fs.writeFileSync(path.join(outDir, 'sitemap.xml'), xml);
+fs.writeFileSync(path.join(outDir, "sitemap.xml"), xml);
 console.log(
   `[sitemap] wrote ${urls.length} URLs (${routeConfig.routes.length} routes + ${products.length} products)`,
 );
