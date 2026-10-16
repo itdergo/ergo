@@ -1,0 +1,86 @@
+# =============================================================================
+# ERGO Contracts Philippines — Apache config for cPanel
+# Target: https://www.ergo.com.ph   (frontend served from public_html)
+# Install as: ~/public_html/.htaccess
+#
+# Requires: mod_rewrite, mod_headers, mod_deflate, mod_expires
+#           mod_proxy (ONLY for the /api reverse proxy in section 5)
+# =============================================================================
+
+# ---------- 1. Rewrites: HTTPS, API proxy, SPA fallback ----------------------
+# Order matters — these are evaluated top to bottom.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # -- Force HTTPS (cPanel terminates TLS before Apache) --
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+  # -- Reverse-proxy the API ------------------------------------------------
+  # The SPA calls a same-origin "/api" (frontend/src/lib/api.ts hardcodes it),
+  # so it MUST be proxied here. Pick ONE target and keep the other commented:
+  #
+  #   (a) Node app on a cPanel subdomain via Passenger (recommended):
+  RewriteRule ^api/(.*)$     https://api.ergo.com.ph/api/$1     [P,L,QSA]
+  RewriteRule ^uploads/(.*)$ https://api.ergo.com.ph/uploads/$1 [P,L,QSA]
+  #
+  #   (b) Node app listening on a local port (standalone / Passenger port):
+  # RewriteRule ^api/(.*)$     http://127.0.0.1:5000/api/$1     [P,L,QSA]
+  # RewriteRule ^uploads/(.*)$ http://127.0.0.1:5000/uploads/$1 [P,L,QSA]
+  #
+  # If mod_proxy is disabled by your host these rules return 500. In that case
+  # drop them and instead point `API_BASE` in frontend/src/lib/api.ts at the API
+  # subdomain (a one-line change), because the browser would otherwise call
+  # https://www.ergo.com.ph/api which no longer exists.
+
+  # -- SPA fallback ----------------------------------------------------------
+  # Prerendered routes already exist as real folders containing index.html
+  # (e.g. /products/index.html). Anything that is not a real file or directory
+  # falls back to the app shell so client-side routing works.
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>
+
+# ---------- 2. Compression ---------------------------------------------------
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml \
+    application/javascript application/json application/xml image/svg+xml
+</IfModule>
+
+# ---------- 3. Cache policy --------------------------------------------------
+<IfModule mod_expires.c>
+  ExpiresActive On
+
+  # Vite emits content-hashed filenames under /assets — safe to cache forever.
+  <FilesMatch "\.(js|css|woff2?|ttf|otf)$">
+    ExpiresDefault "access plus 1 year"
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # Images and media.
+  <FilesMatch "\.(png|jpe?g|gif|webp|avif|svg|ico|mp4|webm)$">
+    ExpiresDefault "access plus 30 days"
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
+
+  # HTML, JSON and the PWA service worker must revalidate, or a deploy will not
+  # be picked up. These come AFTER the asset rules so they win.
+  <FilesMatch "\.(html|json)$">
+    ExpiresDefault "access plus 0 seconds"
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+  <FilesMatch "^(sw|workbox-.*)\.js$">
+    ExpiresDefault "access plus 0 seconds"
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+</IfModule>
+
+# ---------- 4. Security headers (static HTML) --------------------------------
+# The API sets its own via helmet; these cover the static frontend.
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Frame-Options "SAMEORIGIN"
+</IfModule>
