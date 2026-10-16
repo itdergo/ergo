@@ -25,15 +25,19 @@ export default defineConfig({
       // Express API. The frontend proxies /api to it, and every data-driven
       // section (products, industries, solutions, nav categories) needs it —
       // without it the Vite proxy returns ECONNREFUSED and the specs see no data.
+      // PORT is set here (not job-wide) because vite.config.ts also reads PORT
+      // for its own dev-server port, and the two processes need different values.
       command: "npm run dev:api",
       cwd: "..",
       url: "http://localhost:5000/api/healthz",
+      env: { ...process.env, PORT: "5000" } as Record<string, string>,
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,
     },
     {
       command: "npm run dev",
       url: "http://localhost:3000",
+      env: { ...process.env, PORT: "3000" } as Record<string, string>,
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,
     },
