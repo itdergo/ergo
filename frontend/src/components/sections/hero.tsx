@@ -94,7 +94,13 @@ function HeroImage() {
       ref={ref}
       className="hero-image-wrap"
       variants={imageVariants}
-      style={{ perspective: 1200, rotateX, rotateY, transformStyle: "preserve-3d" }}
+      /* No transform-style: preserve-3d here. With preserve-3d the image's
+         translateZ(40px) put it in a 3D rendering context where paint order follows
+         Z depth instead of DOM order — so the photo painted over the experience and
+         floating badges, leaving only a sliver of each card visible at the photo's
+         edge. Flat keeps the depth look (the parent's perspective still scales the
+         translateZ child) while restoring normal DOM-order painting. */
+      style={{ perspective: 1200, rotateX, rotateY }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >

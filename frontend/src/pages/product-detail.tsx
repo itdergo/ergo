@@ -90,7 +90,7 @@ export function ProductDetailPage({ params }: { params: { slug: string } }) {
     return (
       <section className="section">
         <div className="container">
-          <p className="text-gray-500">Loading product…</p>
+          <p className="loading-note">Loading product…</p>
         </div>
       </section>
     );

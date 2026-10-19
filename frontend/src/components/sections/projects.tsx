@@ -10,7 +10,7 @@
  * Data: projectFolders array from lib/project-data.ts (static data)
  * Images: project images in public/images/projects/
  */
-import { asset } from "@/lib/types";
+import { asset, srcSet } from "@/lib/types";
 import { ScrollReveal } from "@/lib/site-ui-primitives";
 import { projectFolders } from "@/lib/project-data";
 import { motion } from "framer-motion";
@@ -42,8 +42,9 @@ export function ProjectsSection() {
                 <div className="project-image">
                   <picture>
                     <source
-                      // WebP srcSet: manually built responsive image paths for projects
-                      srcSet={`${import.meta.env.BASE_URL}images/webp/projects/${p.webp}-400.webp 400w, ${import.meta.env.BASE_URL}images/webp/projects/${p.webp}-800.webp 800w, ${import.meta.env.BASE_URL}images/webp/projects/${p.webp}-1200.webp 1200w`}
+                      // Manifest-driven so a project photo narrower than 1200px can never
+                      // advertise a rung that was not generated (that renders blank).
+                      srcSet={srcSet("projects/" + p.image)}
                       type="image/webp"
                       sizes="(max-width: 768px) 50vw, 20vw"
                     />

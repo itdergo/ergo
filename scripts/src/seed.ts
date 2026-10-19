@@ -134,6 +134,7 @@ async function seed() {
       {
         name: "Executive Chair",
         slug: "executive-chair",
+        imageUrl: "/images/product-executive-chair.jpg",
         categoryId: cats[0]?.id,
         shortDescription: "Premium executive seating with lumbar support",
         description:
@@ -145,6 +146,7 @@ async function seed() {
       {
         name: "Conference Table 12ft",
         slug: "conference-table-12ft",
+        imageUrl: "/images/product-conference-setup.jpg",
         categoryId: cats[1]?.id,
         shortDescription: "12-foot conference table for 12-14 people",
         description:
@@ -156,6 +158,7 @@ async function seed() {
       {
         name: "ES 32 Workstation",
         slug: "es-32-workstation",
+        imageUrl: "/images/product-systems.jpg",
         categoryId: cats[2]?.id,
         shortDescription: "Modular workstation system ES 32",
         description:
@@ -166,6 +169,7 @@ async function seed() {
       {
         name: "Mobile Pedestal",
         slug: "mobile-pedestal",
+        imageUrl: "/images/product-mobile-pedestal.jpg",
         categoryId: cats[3]?.id,
         shortDescription: "3-drawer mobile pedestal with lock",
         description: "Steel mobile pedestal with 3 drawers, lock, and casters for easy mobility.",
@@ -175,6 +179,7 @@ async function seed() {
       {
         name: "Arena Seating A200",
         slug: "arena-seating-a200",
+        imageUrl: "/images/product-group-seating.jpg",
         categoryId: cats[4]?.id,
         shortDescription: "Fixed arena seat with fold-down mechanism",
         description: "Heavy-duty arena seating with fold-down seat, cup holder, and row numbering.",
@@ -185,6 +190,7 @@ async function seed() {
       {
         name: "Kitchen System K100",
         slug: "kitchen-system-k100",
+        imageUrl: "/images/product-kitchen-system.jpg",
         categoryId: cats[5]?.id,
         shortDescription: "Complete kitchen system for modern homes",
         description:

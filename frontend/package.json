@@ -4,8 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --config vite.config.ts --host 0.0.0.0",
-    "build": "vite build --config vite.config.ts && node scripts/gen-sitemap.mjs && node scripts/prerender.mjs",
+    "dev": "npm run images:manifest && vite --config vite.config.ts --host 0.0.0.0",
+    "build": "npm run images:manifest && vite build --config vite.config.ts && node scripts/gen-sitemap.mjs && node scripts/prerender.mjs",
+    "images:manifest": "node scripts/gen-image-manifest.mjs",
+    "images:webp": "bash scripts/gen-webp-variants.sh",
     "sitemap": "node scripts/gen-sitemap.mjs",
     "prerender": "node scripts/prerender.mjs",
     "serve": "vite preview --config vite.config.ts --host 0.0.0.0",

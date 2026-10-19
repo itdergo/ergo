@@ -63,6 +63,7 @@ export function ProductsSection() {
               <Search size={16} />
               <input
                 type="text"
+                aria-label="Search products"
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -153,8 +154,18 @@ export function ProductsSection() {
             ))}
           </div>
           {filteredProducts.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-500">No products found.</p>
+            <div className="products-empty">
+              <p>No products match your search.</p>
+              <button
+                type="button"
+                className="button-secondary"
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedCategory(null);
+                }}
+              >
+                Clear filters
+              </button>
             </div>
           )}
         </div>

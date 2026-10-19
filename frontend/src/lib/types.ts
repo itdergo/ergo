@@ -13,6 +13,7 @@
  * WebP srcSet support for responsive images.
  */
 // Shared TypeScript interfaces and asset helpers.
+import imageManifest from "./image-manifest.json";
 
 export interface Category {
   id: string;
@@ -91,8 +92,20 @@ export const webpLogo = (file: string) => {
   return `${import.meta.env.BASE_URL}images/webp/partners/${slug}-400.webp`;
 };
 // Generate WebP image path (strips extension, adds .webp)
-export const srcSet = (file: string) => {
-  // Build responsive srcSet with 4 width breakpoints for WebP images
+//
+// The rung list comes from scripts/gen-image-manifest.mjs (regenerated on every
+// dev/build). This function used to hard-code 400/800/1200/1600 for every image,
+// but most sources are narrower than 1600 or only had 400/800/1200 generated — so
+// on a wide or high-DPR viewport the browser selected a rung that does not exist
+// and the photo rendered blank. The SPA fallback answers a missing file with
+// index.html and HTTP 200, so nothing logged an error and the holder just sat empty.
+//
+// Returns undefined when the image has no WebP rung. Callers can pass that
+// straight into <source srcSet={...}> — React drops the attribute and the browser
+// skips the sourceless <source>, falling through to the <img> original.
+export const srcSet = (file: string): string | undefined => {
+  const rungs = (imageManifest as Record<string, number[] | undefined>)[file];
+  if (!rungs || rungs.length === 0) return undefined;
   const base = webpAsset(file);
-  return `${base}-400.webp 400w, ${base}-800.webp 800w, ${base}-1200.webp 1200w, ${base}-1600.webp 1600w`;
+  return rungs.map((w) => `${base}-${w}.webp ${w}w`).join(", ");
 };

@@ -107,7 +107,13 @@ export function ContactSection() {
             <div className="form-grid">
               <div className="form-field">
                 <label htmlFor="consult-name">Full name *</label>
-                <input id="consult-name" name="name" required placeholder="Juan Dela Cruz" />
+                <input
+                  id="consult-name"
+                  name="name"
+                  autoComplete="name"
+                  required
+                  placeholder="Juan Dela Cruz"
+                />
               </div>
               <div className="form-field">
                 <label htmlFor="consult-email">Email *</label>
@@ -115,17 +121,29 @@ export function ContactSection() {
                   id="consult-email"
                   name="email"
                   type="email"
+                  autoComplete="email"
                   required
                   placeholder="juan@company.com"
                 />
               </div>
               <div className="form-field">
                 <label htmlFor="consult-company">Company</label>
-                <input id="consult-company" name="company" placeholder="Company name" />
+                <input
+                  id="consult-company"
+                  name="company"
+                  autoComplete="organization"
+                  placeholder="Company name"
+                />
               </div>
               <div className="form-field">
                 <label htmlFor="consult-phone">Phone</label>
-                <input id="consult-phone" name="phone" type="tel" placeholder="+63 ..." />
+                <input
+                  id="consult-phone"
+                  name="phone"
+                  type="tel"
+                  autoComplete="tel"
+                  placeholder="+63 ..."
+                />
               </div>
             </div>
             <div className="form-field message-field">

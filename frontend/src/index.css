@@ -217,6 +217,8 @@ button {
 }
 .menu-toggle {
   display: none;
+  min-width: 44px;
+  min-height: 44px;
   padding: 8px;
   background: transparent;
   border: 0;
@@ -401,7 +403,10 @@ h4 {
 }
 .hero-image {
   width: 100%;
-  aspect-ratio: 4/5;
+  /* Matches the hero photo's own orientation (hero-chairs.jpg is 1600x1066, 3:2).
+     A 4/5 portrait holder discarded 47% of the photo's width and then stretched the
+     remaining strip across the tall box, so the hero was both over-cropped and soft. */
+  aspect-ratio: 3 / 2;
   border: 1px solid var(--line);
   border-radius: 24px;
   object-fit: cover;
@@ -443,6 +448,13 @@ h4 {
   gap: 64px;
   align-items: center;
 }
+/* Grid tracks default to a min-content floor, so a single wide child can push
+   the track (and the whole page) past the viewport. `min-width: 0` lets the
+   1fr track shrink and the child reflow instead of overflowing. */
+.about-grid > *,
+.contact-grid > * {
+  min-width: 0;
+}
 .about-facts {
   padding: 34px;
   border: 1px solid var(--line);
@@ -458,7 +470,12 @@ h4 {
   line-height: 1.3;
   letter-spacing: -0.03em;
 }
-.about-stats {
+/* `.stats` is declared later in this sheet at equal specificity, so it was
+   winning all three declarations below and this stacked-divider layout never
+   applied. The 3-column fallback gave `.about-facts` a 381px min-content —
+   11px wider than the 350px mobile content box — which forced the whole page
+   to scroll sideways at 390px. Doubling the class restores the intended order. */
+.stats.about-stats {
   grid-template-columns: 1fr;
   gap: 0;
   margin-top: 20px;
@@ -580,8 +597,8 @@ h4 {
   top: 10px;
   right: 10px;
   z-index: 2;
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
   display: grid;
   place-items: center;
   border-radius: 50%;
@@ -605,6 +622,9 @@ h4 {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  /* Vertical padding gives the CTA a >=24px hit area (WCAG 2.2 target size);
+     as a bare inline-flex text link it measured only 16px tall. */
+  padding-block: 5px;
   color: var(--brand-deep);
   font-size: 13px;
   font-weight: 600;
@@ -1121,8 +1141,14 @@ h4 {
   .hero-grid {
     align-items: start;
   }
+  /* Single-column hero: the grid's bottom edge is now the image's bottom edge, so the
+     indicator's bottom-centre anchor lands on top of the photo (z-index 10) instead of
+     in the gap below it. Hide it rather than pin it over the image. */
+  .scroll-indicator {
+    display: none;
+  }
   .hero-image {
-    aspect-ratio: 5/4;
+    aspect-ratio: 3 / 2;
   }
   .product-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -1225,7 +1251,7 @@ h4 {
   }
   .hero-image {
     height: auto;
-    aspect-ratio: 4/5;
+    aspect-ratio: 3 / 2;
   }
   .experience-badge {
     left: 12px;
@@ -1626,7 +1652,7 @@ h4 {
   gap: 8px;
 }
 .filter-btn {
-  padding: 8px 16px;
+  padding: 11px 18px;
   border: 1px solid var(--line);
   border-radius: 999px;
   background: white;
@@ -2000,8 +2026,8 @@ h4 {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
   border: none;
   border-radius: 8px;
   background: rgba(0, 0, 0, 0.55);
@@ -2443,6 +2469,17 @@ h4 {
   transform: translateY(-2px);
   border-color: var(--brand);
 }
+.partner-marquee-card picture {
+  /* The <picture> wrapper has no definite height of its own, so an img inside it
+     cannot resolve max-height: 100% — the constraint is dropped and tall logos
+     overflow the 80px card, then get clipped by the row's overflow: hidden.
+     Making the wrapper a full-size flex box gives the img a definite height. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
 .partner-marquee-card img {
   max-width: 100%;
   max-height: 100%;
@@ -2542,5 +2579,111 @@ h4 {
   }
   .faq-categories {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   Classes replacing dead Tailwind utilities.
+   index.css never actually imports Tailwind (only the Google Fonts @import is
+   real — the doc comment at the top of this file claims otherwise), so every
+   Tailwind utility class in the JSX was a no-op. These carry the intent of the
+   utilities they replace.
+   ========================================================================== */
+
+/* Site loading shell — was `min-h-screen flex items-center justify-center`
+   plus a `w-12 h-12 border-4 … animate-spin` spinner that rendered as a 0x0
+   invisible div. */
+.site-loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.site-loading-inner {
+  text-align: center;
+}
+.site-loading .spinner {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 16px;
+  border: 4px solid var(--brand);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin-loader 0.9s linear infinite;
+}
+@keyframes spin-loader {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.site-loading p,
+.loading-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* Discreet admin launcher — was `fixed bottom-4 right-4 bg-gray-800 … z-50`,
+   which without Tailwind fell back into normal flow as a full-width button
+   pinned after the footer. */
+.admin-launcher {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 50;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(23, 27, 22, 0.85);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.3;
+  transition:
+    opacity 0.2s ease,
+    background-color 0.2s ease;
+}
+.admin-launcher:hover,
+.admin-launcher:focus-visible {
+  opacity: 1;
+  background: var(--ink);
+}
+
+/* Products empty state — was `text-center py-12` + `text-gray-500`, which
+   rendered as a bare left-aligned 20px line with no padding or colour. */
+.products-empty {
+  margin-top: 40px;
+  padding: 56px 24px;
+  text-align: center;
+  border: 1px dashed var(--line);
+  border-radius: 18px;
+  background: var(--soft);
+}
+.products-empty p {
+  margin: 0 0 18px;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+/* ==========================================================================
+   Responsive overrides that MUST stay last.
+   `.project-grid`'s base rule is declared further down this sheet than the
+   @media block that tries to make it responsive, so at equal specificity the
+   base rule won and the grid stayed 5-up at every width — 57px-wide cards on a
+   390px phone, with the project name clipped out of the overlay. Keep any
+   override for these selectors after every base rule for them.
+   ========================================================================== */
+@media (max-width: 1023px) {
+  .project-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 639px) {
+  .project-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .about-facts {
+    padding: 22px;
   }
 }

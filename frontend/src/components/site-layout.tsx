@@ -90,10 +90,10 @@ export function SiteLayout({
   if (loading) {
     // Loading state: shown while site context fetches initial data
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-green-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-500">Loading...</p>
+      <div className="site-loading">
+        <div className="site-loading-inner">
+          <div className="spinner" />
+          <p>Loading...</p>
         </div>
       </div>
     );
@@ -357,10 +357,7 @@ export function SiteLayout({
         </footer>
       </div>
 
-      <button
-        onClick={onAdminLogin}
-        className="fixed bottom-4 right-4 bg-gray-800 text-white px-3 py-2 rounded-lg text-xs opacity-30 hover:opacity-100 transition-opacity z-50"
-      >
+      <button onClick={onAdminLogin} className="admin-launcher">
         Admin
       </button>
       <button
