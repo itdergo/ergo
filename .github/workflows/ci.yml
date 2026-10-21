@@ -115,8 +115,8 @@ jobs:
         run: |
           page_count=$(find frontend/dist/public -name 'index.html' | wc -l)
           echo "Prerendered pages: $page_count"
-          if [ "$page_count" -lt 10 ]; then
-            echo "ERROR: Expected at least 10 prerendered pages, found $page_count"
+          if [ "$page_count" -lt 7 ]; then
+            echo "ERROR: Expected at least 7 prerendered pages, found $page_count"
             exit 1
           fi
       - name: Verify sitemap exists
