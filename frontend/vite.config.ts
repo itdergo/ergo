@@ -58,7 +58,7 @@ export default defineConfig({
         name: "ERGO Contracts Philippines",
         short_name: "ERGO",
         description: "Ergonomic furniture and workplace solutions",
-        theme_color: "#4F8F24",
+        theme_color: "#50A014",
         background_color: "#ffffff",
         display: "standalone",
         // Build output to dist/public for backend static serving

@@ -138,7 +138,7 @@ const faqCategories = [
     faqs: [
       {
         q: "How long has ERGO been in business?",
-        a: "ERGO Contracts Philippines has been designing and manufacturing workplace furniture for over 30 years. We have completed over 500 projects across the Philippines, serving corporate offices, government agencies, educational institutions, and commercial spaces with German-engineered seating and systems furniture.",
+        a: "ERGO has been designing and manufacturing workplace furniture since 1986 — over 40 years. We have completed over 500 projects across the Philippines, serving corporate offices, government agencies, educational institutions, and commercial spaces with German-engineered seating and systems furniture.",
       },
       {
         q: "Where are your products manufactured?",
@@ -185,12 +185,15 @@ function FaqItem({
   isOpen,
   onToggle,
   index,
+  answerId,
 }: {
   q: string;
   a: string;
   isOpen: boolean;
   onToggle: () => void;
   index: number;
+  /** DOM id of the answer region, referenced by the toggle's aria-controls. */
+  answerId: string;
 }) {
   return (
     <motion.div
@@ -200,21 +203,36 @@ function FaqItem({
       viewport={{ once: true, margin: "-30px" }}
       transition={{ duration: 0.35, delay: index * 0.05 }}
     >
-      <button className="faq-question" onClick={onToggle} aria-expanded={isOpen}>
+      <button
+        className="faq-question"
+        onClick={onToggle}
+        aria-expanded={isOpen}
+        aria-controls={answerId}
+      >
         <span className="faq-question-text">
-          <span className="faq-number">{String(index + 1).padStart(2, "0")}</span>
+          <span className="faq-number" aria-hidden="true">
+            {String(index + 1).padStart(2, "0")}
+          </span>
           {q}
         </span>
         <motion.span
           className="faq-chevron"
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.25 }}
+          aria-hidden="true"
         >
           {isOpen ? <Minus size={16} /> : <Plus size={16} />}
         </motion.span>
       </button>
       <motion.div
         className="faq-answer"
+        id={answerId}
+        role="region"
+        aria-label={q}
+        /* A collapsed answer is animated to height 0 and opacity 0, but it
+           stays in the accessibility tree. Hide it from assistive tech until
+           it is actually open. */
+        aria-hidden={!isOpen}
         initial={false}
         animate={{ height: isOpen ? "auto" : 0, opacity: isOpen ? 1 : 0 }}
         transition={{ duration: 0.25, ease: "easeInOut" }}
@@ -255,18 +273,23 @@ export function FaqSection() {
 
   return (
     <ScrollReveal>
-      <section className="section" id="faq">
+      <section className="section section--sm" id="faq">
         <div className="container">
           <div className="section-head">
             <span className="section-label">FAQ</span>
-            <h2 className="section-heading">Expert answers, zero guesswork.</h2>
+            <h2 className="section-heading section-heading--md">Expert answers, zero guesswork.</h2>
             <p className="section-intro">
               Everything you need to know about our products, services, and process.
             </p>
           </div>
           <div className="faq-toolbar">
             <span className="faq-count">{totalFaqs} questions</span>
-            <button className="faq-toggle-all" onClick={toggleAll}>
+            <button
+              type="button"
+              className="faq-toggle-all"
+              onClick={toggleAll}
+              aria-expanded={allOpen}
+            >
               {allOpen ? "Collapse all" : "Expand all"}
             </button>
           </div>
@@ -276,17 +299,26 @@ export function FaqSection() {
               const isCatExpanded = allOpen || expandedCats.has(ci);
               return (
                 <div className="faq-category" key={cat.title}>
-                  <button
-                    className="faq-category-head"
-                    onClick={() => toggleCat(ci)}
-                    aria-expanded={isCatExpanded}
-                  >
-                    <div className="faq-category-icon">
-                      <Icon size={20} strokeWidth={1.8} />
-                    </div>
-                    <h3>{cat.title}</h3>
-                    <span className="faq-cat-toggle">{isCatExpanded ? "−" : "+"}</span>
-                  </button>
+                  {/* The heading wraps the toggle button rather than sitting
+                      inside it: <button> may only contain phrasing content, so
+                      an <h3> nested in one was invalid HTML and made the
+                      heading's role ambiguous for assistive technology. */}
+                  <h3 className="faq-category-heading">
+                    <button
+                      type="button"
+                      className="faq-category-head"
+                      onClick={() => toggleCat(ci)}
+                      aria-expanded={isCatExpanded}
+                    >
+                      <span className="faq-category-icon">
+                        <Icon size={20} strokeWidth={1.8} aria-hidden="true" />
+                      </span>
+                      <span className="faq-category-title">{cat.title}</span>
+                      <span className="faq-cat-toggle" aria-hidden="true">
+                        {isCatExpanded ? "−" : "+"}
+                      </span>
+                    </button>
+                  </h3>
                   {isCatExpanded && (
                     <div className="faq-list">
                       {cat.faqs.map((faq, fi) => {
@@ -298,6 +330,7 @@ export function FaqSection() {
                             index={fi}
                             q={faq.q}
                             a={faq.a}
+                            answerId={`faq-answer-${ci}-${fi}`}
                             isOpen={isOpen}
                             onToggle={() => {
                               if (allOpen) {

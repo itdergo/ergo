@@ -6,18 +6,20 @@
  * - Category filter buttons: filter by product category
  * - Product grid: responsive 3-column grid of TiltCard-wrapped product cards
  * - Each card: photo with zoom lightbox, category badge, wishlist button,
- *   title, description, "View Details" and "Request Quote" links
+ *   linked title, description, "View Details" and "Request Quote" links
  * - Lightbox: full-screen image viewer with Escape/click-to-close
  * - Empty state: "No products found" message when filters match nothing
  *
  * Data flow:
  * - Receives products, categories, searchQuery, selectedCategory from useSite()
  * - filteredProducts is memoized in context (search + category filtering)
- * - Card click navigates to contact section (unless clicking a link/button)
+ * - Navigation happens through explicit links (title + "View Details"), never
+ *   through a whole-card click handler
  *
  * Uses: TiltCard (3D hover effect), Lightbox, ScrollReveal, Framer Motion
  */
 import { useState } from "react";
+import { Link } from "wouter";
 import { useSite } from "@/lib/site-context";
 import { srcSet } from "@/lib/types";
 import { TiltCard, ScrollReveal } from "@/lib/site-ui-primitives";
@@ -32,11 +34,13 @@ export function ProductsSection() {
     selectedCategory,
     setSelectedCategory,
     filteredProducts,
-    scrollToContact,
+    showToast,
   } = useSite();
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
   // Lightbox state: stores image src + alt for full-screen viewer
   const [lightboxAlt, setLightboxAlt] = useState("");
+  const [wishlist, setWishlist] = useState<Set<string>>(new Set());
+  // Wishlist: client-side toggle with toast confirmation
 
   const openLightbox = (src: string, alt: string) => {
     // Open/close lightbox handlers
@@ -90,15 +94,14 @@ export function ProductsSection() {
           <div className="product-grid">
             {filteredProducts.map((p) => (
               <TiltCard
-                // TiltCard wraps each product card for 3D hover effect
+                // TiltCard wraps each product card for a 3D hover effect.
+                // The card itself is NOT clickable: navigation is exposed through
+                // the product title link and the explicit "View Details" /
+                // "Request Quote" actions. A whole-card click handler used to
+                // compete with those controls (and was unreachable by keyboard).
                 key={p.id}
                 className="product-card"
                 maxTilt={6}
-                onClick={(e) => {
-                  // Card click: navigate to contact (unless clicking interactive elements)
-                  if ((e.target as HTMLElement).closest("a,button")) return;
-                  scrollToContact();
-                }}
               >
                 <div className={`product-photo${p.imageUrl ? "" : " product-photo-placeholder"}`}>
                   {p.imageUrl ? (
@@ -130,21 +133,45 @@ export function ProductsSection() {
                     </div>
                   )}
                   {p.category && <span className="product-badge">{p.category.name}</span>}
-                  <button className="product-wishlist" aria-label="Add to wishlist">
-                    {/* Wishlist button: decorative (no backend integration) */}
+                  <button
+                    className={`product-wishlist ${wishlist.has(p.id) ? "active" : ""}`}
+                    aria-label={wishlist.has(p.id) ? "Remove from wishlist" : "Add to wishlist"}
+                    aria-pressed={wishlist.has(p.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const next = new Set(wishlist);
+                      if (next.has(p.id)) next.delete(p.id);
+                      else next.add(p.id);
+                      setWishlist(next);
+                      showToast({
+                        message: next.has(p.id)
+                          ? `${p.name} added to your wishlist`
+                          : `${p.name} removed from your wishlist`,
+                        type: "success",
+                      });
+                    }}
+                  >
+                    {/* Wishlist toggle (client-side) */}
                     <Heart size={16} />
                   </button>
                 </div>
                 <div className="product-text">
                   <div className="card-title-row">
-                    <h3 className="card-title">{p.name}</h3>
-                    <ArrowUpRight className="arrow-icon" size={17} />
+                    <h3 className="card-title">
+                      {/* The title is the card's primary link target — it gives
+                          keyboard and screen-reader users a way to open the
+                          product, which the removed whole-card click did not. */}
+                      <Link href={`/products/${p.slug}`} className="card-title-link">
+                        {p.name}
+                      </Link>
+                    </h3>
+                    <ArrowUpRight className="arrow-icon" size={17} aria-hidden="true" />
                   </div>
                   <p className="card-description">{p.shortDescription || p.description}</p>
                   <div className="product-actions">
-                    <a href={`/products/${p.slug}`} className="product-cta">
+                    <Link href={`/products/${p.slug}`} className="product-cta">
                       View Details <ArrowRight size={13} />
-                    </a>
+                    </Link>
                     <a href="#contact" className="product-cta product-cta-quote">
                       Request Quote
                     </a>
@@ -168,6 +195,9 @@ export function ProductsSection() {
               </button>
             </div>
           )}
+          <a className="text-link section-cta" href="/contact">
+            Request a product quote <ArrowRight size={15} />
+          </a>
         </div>
       </section>
       <Lightbox src={lightboxSrc} alt={lightboxAlt} onClose={closeLightbox} />

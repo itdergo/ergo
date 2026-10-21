@@ -13,7 +13,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ScrollReveal } from "@/lib/site-ui-primitives";
-import { Star, Quote, ChevronLeft, ChevronRight } from "lucide-react";
+import { Star, Quote, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 
 const testimonials = [
   // Static testimonial data: name, role, text, rating
@@ -79,7 +79,9 @@ export function TestimonialsSection() {
         <div className="container">
           <div className="section-head">
             <span className="section-label">Testimonials</span>
-            <h2 className="section-heading">Trusted by leading organizations.</h2>
+            <h2 className="section-heading section-heading--md">
+              Trusted by leading organizations.
+            </h2>
             <p className="section-intro">Hear from the teams who work with ERGO every day.</p>
           </div>
           <div className="testimonial-dots">
@@ -145,6 +147,9 @@ export function TestimonialsSection() {
               <ChevronRight size={20} />
             </button>
           </div>
+          <a className="text-link section-cta" href="#contact">
+            Start your project <ArrowRight size={15} />
+          </a>
         </div>
       </section>
     </ScrollReveal>

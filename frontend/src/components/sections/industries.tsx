@@ -16,6 +16,7 @@ import { asset, srcSet } from "@/lib/types";
 import { ScrollReveal } from "@/lib/site-ui-primitives";
 import { getIcon } from "@/lib/image-maps";
 import { industryImages } from "@/lib/image-maps";
+import { ArrowRight } from "lucide-react";
 import { useSite } from "@/lib/site-context";
 
 /**
@@ -38,7 +39,7 @@ export function IndustriesSection() {
         <div className="container">
           <div className="section-head">
             <span className="section-label">Industries</span>
-            <h2 className="section-heading">Built for the spaces you run.</h2>
+            <h2 className="section-heading section-heading--md">Built for the spaces you run.</h2>
             <p className="section-intro">
               ERGO furnishes the environments where people learn, work, gather and recover — across
               the Philippines and Southeast Asia.
@@ -76,6 +77,9 @@ export function IndustriesSection() {
               );
             })}
           </div>
+          <a className="text-link section-cta" href="#contact">
+            Discuss your space <ArrowRight size={15} />
+          </a>
         </div>
       </section>
     </ScrollReveal>

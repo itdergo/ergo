@@ -80,7 +80,26 @@ export function SiteLayout({
     return () => document.removeEventListener("keydown", onKey);
   }, []);
 
-  const isActive = (href: string) => (href === "/" ? location === "/" : location.startsWith(href));
+  useEffect(() => {
+    // Lock page scroll while the mobile drawer is open so the scrim is the
+    // only thing behind it (prevents the background page from scrolling).
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
+
+  const isActive = (href: string) => {
+    // Strip the hash segment (e.g. "/#testimonials" → "/") so the active-state
+    // check still matches anchor links that point at page sections.
+    const path = href.split("#")[0];
+    const loc = location.split("#")[0];
+    return path === "/" ? loc === "/" : loc.startsWith(path);
+  };
   // Active link detection: exact match for /, prefix match for others
 
   const { scrollYProgress } = useScroll();
@@ -102,6 +121,9 @@ export function SiteLayout({
   return (
     <>
       <motion.div className="scroll-progress" style={{ scaleX }} />
+      <a className="skip-link" href="#main-content">
+        Skip to main content
+      </a>
       <div className="site">
         <header className={`site-header ${scrolled ? "scrolled" : ""}`}>
           <nav className="nav-shell" aria-label="Main navigation">
@@ -182,7 +204,14 @@ export function SiteLayout({
           </nav>
 
           {mobileOpen && (
-            <div className="mobile-nav">
+            <div
+              className="mobile-nav-scrim"
+              onClick={() => setMobileOpen(false)}
+              aria-hidden="true"
+            />
+          )}
+          {mobileOpen && (
+            <div className="mobile-nav" role="dialog" aria-label="Mobile navigation">
               <Link href="/" onClick={() => setMobileOpen(false)}>
                 Home
               </Link>
@@ -231,7 +260,9 @@ export function SiteLayout({
           )}
         </header>
 
-        <main>{children}</main>
+        <main id="main-content" tabIndex={-1}>
+          {children}
+        </main>
 
         <footer className="site-footer">
           <div className="container footer-inner">
@@ -368,7 +399,11 @@ export function SiteLayout({
         <ArrowUpRight size={18} />
       </button>
       {toast && (
-        <div className={`toast show ${toast.type === "success" ? "toast-success" : "toast-error"}`}>
+        <div
+          className={`toast show ${toast.type === "success" ? "toast-success" : "toast-error"}`}
+          role="status"
+          aria-live="polite"
+        >
           {toast.message}
         </div>
       )}

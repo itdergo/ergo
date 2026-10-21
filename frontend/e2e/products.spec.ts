@@ -39,4 +39,71 @@ test.describe("Products Page", () => {
     await expect(searchInput).toBeVisible();
     await expect(searchInput).toHaveAttribute("placeholder", "Search products...");
   });
+
+  test("wishlist button toggles state and announces it", async ({ page }) => {
+    await page.goto("/products");
+
+    const wishlist = page.locator(".product-wishlist").first();
+    await expect(wishlist).toBeVisible();
+    await expect(wishlist).toHaveAttribute("aria-pressed", "false");
+
+    await wishlist.click();
+    await expect(wishlist).toHaveAttribute("aria-pressed", "true");
+    // The accessible label flips to describe the action the button now performs.
+    await expect(wishlist).toHaveAttribute("aria-label", /Remove from wishlist/);
+
+    await wishlist.click();
+    await expect(wishlist).toHaveAttribute("aria-pressed", "false");
+    await expect(wishlist).toHaveAttribute("aria-label", /Add to wishlist/);
+  });
+
+  test("wishlist button does not trigger the card's links", async ({ page }) => {
+    await page.goto("/products");
+
+    // Toggling the wishlist must not navigate away from the products page.
+    await page.locator(".product-wishlist").first().click();
+    await expect(page).toHaveURL(/\/products$/);
+  });
+
+  test("product card exposes independent View Details and Request Quote actions", async ({
+    page,
+  }) => {
+    await page.goto("/products");
+
+    const firstCard = page.locator(".product-card").first();
+
+    const viewDetails = firstCard.locator("a.product-cta", { hasText: "View Details" });
+    const requestQuote = firstCard.locator("a.product-cta-quote", { hasText: "Request Quote" });
+
+    await expect(viewDetails).toBeVisible();
+    await expect(requestQuote).toBeVisible();
+
+    // They point at different destinations — neither hijacks the other.
+    await expect(viewDetails).toHaveAttribute("href", /\/products\//);
+    await expect(requestQuote).toHaveAttribute("href", "#contact");
+  });
+
+  test("product title is a link so the card is keyboard reachable", async ({ page }) => {
+    await page.goto("/products");
+
+    // The removed whole-card click handler was unreachable by keyboard; the
+    // title link restores a real, focusable way to open a product.
+    const titleLink = page.locator(".product-card .card-title-link").first();
+    await expect(titleLink).toBeVisible();
+    await expect(titleLink).toHaveAttribute("href", /\/products\//);
+  });
+
+  test("View Details navigates to the product detail page", async ({ page }) => {
+    await page.goto("/products");
+
+    const viewDetails = page
+      .locator(".product-card a.product-cta", {
+        hasText: "View Details",
+      })
+      .first();
+    await viewDetails.click();
+
+    await expect(page).toHaveURL(/\/products\/[a-z0-9-]+/);
+    await expect(page.locator(".product-detail")).toBeVisible();
+  });
 });

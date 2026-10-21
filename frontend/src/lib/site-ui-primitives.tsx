@@ -9,11 +9,25 @@
  * These primitives use Framer Motion for animations and are memoized
  * for performance.
  */
-import { useState, useRef, memo } from "react";
+import { useState, useRef, useEffect, memo } from "react";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import type { TiltCardProps, ScrollRevealProps, ParallaxImageProps } from "./site-ui-types";
 
-// 3D Tilt Card Component
+/* Hook: respects the user's prefers-reduced-motion setting so motion-sensitive
+   visitors can disable parallax, tilt, reveals and the marquee. */
+export function useReducedMotion() {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduced(mq.matches);
+    const onChange = () => setReduced(mq.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+  return reduced;
+}
+
+// 3D Tilt Card Component — disabled under prefers-reduced-motion.
 const TiltCard = memo(function TiltCard({
   children,
   className = "",
@@ -22,9 +36,10 @@ const TiltCard = memo(function TiltCard({
 }: TiltCardProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [transform, setTransform] = useState("perspective(1000px) rotateX(0deg) rotateY(0deg)");
+  const reduced = useReducedMotion();
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
+    if (reduced || !ref.current) return;
     const rect = ref.current.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width;
     const y = (e.clientY - rect.top) / rect.height;
@@ -36,6 +51,7 @@ const TiltCard = memo(function TiltCard({
   };
 
   const handleMouseLeave = () => {
+    if (reduced) return;
     setTransform("perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)");
   };
 
@@ -43,9 +59,13 @@ const TiltCard = memo(function TiltCard({
     <div
       ref={ref}
       className={className}
-      style={{ transform, transition: "transform 0.15s ease-out", transformStyle: "preserve-3d" }}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
+      style={{
+        transform,
+        transition: reduced ? "none" : "transform 0.15s ease-out",
+        transformStyle: "preserve-3d",
+      }}
+      onMouseMove={reduced ? undefined : handleMouseMove}
+      onMouseLeave={reduced ? undefined : handleMouseLeave}
       onClick={onClick}
     >
       {children}
@@ -53,7 +73,9 @@ const TiltCard = memo(function TiltCard({
   );
 });
 
-// Scroll Reveal Component
+// Scroll Reveal Component — scroll-triggered fade-in-up (plays once).
+// Bug fix: initial and animate previously had identical values, so nothing
+// ever animated. Reduced motion is honoured by rendering static content.
 const ScrollReveal = memo(function ScrollReveal({
   children,
   className = "",
@@ -61,13 +83,14 @@ const ScrollReveal = memo(function ScrollReveal({
 }: ScrollRevealProps) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-80px" });
+  const reduced = useReducedMotion();
 
   return (
     <motion.div
       ref={ref}
       className={className}
-      initial={{ opacity: 1, y: 0 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 1, y: 0 }}
+      initial={reduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+      animate={reduced || isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
       transition={{ duration: 0.7, delay, ease: [0.25, 0.46, 0.45, 0.94] }}
     >
       {children}

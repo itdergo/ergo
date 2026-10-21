@@ -15,6 +15,7 @@
  * - Resets form on successful submission
  */
 import { useSite } from "@/lib/site-context";
+import { asset, srcSet } from "@/lib/types";
 import { ScrollReveal } from "@/lib/site-ui-primitives";
 import { ArrowUpRight, Clock, Globe, Mail, MapPin, Phone, Send, ShieldCheck } from "lucide-react";
 
@@ -106,24 +107,36 @@ export function ContactSection() {
             {/* Form submission handled by site context (api.createInquiry) */}
             <div className="form-grid">
               <div className="form-field">
-                <label htmlFor="consult-name">Full name *</label>
+                <label htmlFor="consult-name">
+                  Full name{" "}
+                  <span className="required" aria-hidden="true">
+                    *
+                  </span>
+                </label>
                 <input
                   id="consult-name"
                   name="name"
                   autoComplete="name"
                   required
+                  aria-required="true"
                   placeholder="Juan Dela Cruz"
                 />
               </div>
               <div className="form-field">
-                <label htmlFor="consult-email">Email *</label>
+                <label htmlFor="consult-email">
+                  Email{" "}
+                  <span className="required" aria-hidden="true">
+                    *
+                  </span>
+                </label>
                 <input
                   id="consult-email"
                   name="email"
                   type="email"
                   autoComplete="email"
                   required
-                  placeholder="juan@company.com"
+                  aria-required="true"
+                  placeholder="sales@ergo.com.ph"
                 />
               </div>
               <div className="form-field">
@@ -147,11 +160,17 @@ export function ContactSection() {
               </div>
             </div>
             <div className="form-field message-field">
-              <label htmlFor="consult-message">Message *</label>
+              <label htmlFor="consult-message">
+                Message{" "}
+                <span className="required" aria-hidden="true">
+                  *
+                </span>
+              </label>
               <textarea
                 id="consult-message"
                 name="message"
                 required
+                aria-required="true"
                 rows={4}
                 placeholder="Tell us about your project..."
               />
@@ -161,12 +180,41 @@ export function ContactSection() {
             </button>
             {formStatus && <p className="form-status">{formStatus}</p>}
           </form>
+          <div className="branch-network">
+            <p className="section-intro">
+              Visit a showroom near you, or reach any of our representative offices and retail
+              partners across the Philippines and overseas.
+            </p>
+            <figure className="branch-network-figure">
+              <picture>
+                <source
+                  srcSet={srcSet("branch-network.jpg")}
+                  type="image/webp"
+                  sizes="(max-width: 768px) 100vw, 1200px"
+                />
+                <img
+                  className="branch-network-img"
+                  src={asset("branch-network.jpg")}
+                  alt="ERGO Philippine and global presence: global offices in the USA, China, Vietnam, Malaysia, Singapore and Nigeria; Philippine retail locations at SM Megamall, Cebu and Davao"
+                  width={1600}
+                  height={900}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </picture>
+              <figcaption>
+                ERGO Philippine and global presence — representative offices in the USA, China,
+                Vietnam, Malaysia, Singapore and Nigeria, with retail locations at SM Megamall, Cebu
+                and Davao.
+              </figcaption>
+            </figure>
+          </div>
           <div className="contact-map">
             {/* Google Maps embed: lazy-loaded iframe showing office location */}
             <iframe
               title="ERGO Contracts Philippines office location map"
               src="https://www.google.com/maps?q=2634%20Rockefeller%20Street%2C%20San%20Isidro%2C%20Makati%20City%2C%20Philippines&z=17&output=embed"
-              loading="eager"
+              loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
               allowFullScreen
             />

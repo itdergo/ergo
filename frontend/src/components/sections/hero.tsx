@@ -6,7 +6,7 @@
  * - 3D mouse-tracking image tilt (HeroImage component)
  * - Parallax scrolling background orbs and grid
  * - Floating badges ("German Engineering", "BIFMA Standards")
- * - Experience badge (30+ years)
+ * - Experience badge (40+ years)
  * - Animated scroll indicator
  * - Responsive image with WebP srcSet
  *
@@ -21,6 +21,7 @@
  */
 import { asset, srcSet } from "@/lib/types";
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from "framer-motion";
+import { useReducedMotion } from "@/lib/site-ui-primitives";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { useRef } from "react";
 
@@ -65,8 +66,10 @@ const badgeVariants = {
 };
 
 function HeroImage() {
-  // HeroImage: 3D tilt effect tracking mouse position
+  // HeroImage: 3D tilt effect tracking mouse position (disabled under
+  // prefers-reduced-motion for vestibular safety)
   const ref = useRef<HTMLDivElement>(null);
+  const reduced = useReducedMotion();
   const mouseX = useMotionValue(0);
   // Motion values: track normalized mouse position for tilt calculation
   const mouseY = useMotionValue(0);
@@ -78,6 +81,7 @@ function HeroImage() {
   const rotateY = useTransform(springX, [-0.5, 0.5], [-8, 8]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (reduced) return;
     const rect = ref.current?.getBoundingClientRect();
     if (!rect) return;
     mouseX.set((e.clientX - rect.left) / rect.width - 0.5);
@@ -85,6 +89,7 @@ function HeroImage() {
   };
 
   const handleMouseLeave = () => {
+    if (reduced) return;
     mouseX.set(0);
     mouseY.set(0);
   };
@@ -100,9 +105,13 @@ function HeroImage() {
          floating badges, leaving only a sliver of each card visible at the photo's
          edge. Flat keeps the depth look (the parent's perspective still scales the
          translateZ child) while restoring normal DOM-order painting. */
-      style={{ perspective: 1200, rotateX, rotateY }}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
+      style={{
+        perspective: 1200,
+        rotateX: reduced ? 0 : rotateX,
+        rotateY: reduced ? 0 : rotateY,
+      }}
+      onMouseMove={reduced ? undefined : handleMouseMove}
+      onMouseLeave={reduced ? undefined : handleMouseLeave}
     >
       <div className="hero-image-glow" />
       <motion.div className="hero-image-depth" style={{ transform: "translateZ(40px)" }}>
@@ -128,7 +137,7 @@ function HeroImage() {
         whileHover={{ scale: 1.06, y: -4, transition: { duration: 0.25 } }}
       >
         <strong>
-          30<span>+</span>
+          40<span>+</span>
         </strong>
         <small>Years of expertise</small>
       </motion.div>
@@ -138,8 +147,10 @@ function HeroImage() {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 1.5, duration: 0.6 }}
       >
-        <span className="float-badge-icon">&#9679;</span>
-        <span>German Engineering</span>
+        <span className="float-badge-icon" style={{ color: "var(--luxury-gold)" }}>
+          &#9679;
+        </span>
+        <span>Premium Quality</span>
       </motion.div>
       <motion.div
         className="hero-float-badge hero-float-2"
@@ -147,8 +158,10 @@ function HeroImage() {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 1.7, duration: 0.6 }}
       >
-        <span className="float-badge-icon">&#9679;</span>
-        <span>BIFMA Standards</span>
+        <span className="float-badge-icon" style={{ color: "var(--luxury-gold)" }}>
+          &#9679;
+        </span>
+        <span>German Technology</span>
       </motion.div>
     </motion.div>
   );
@@ -175,16 +188,18 @@ function ScrollIndicator() {
 
 export function HeroSection() {
   // HeroSection: parallax background orbs + grid + content layout
+  // Parallax is disabled under prefers-reduced-motion.
   const { scrollY } = useScroll();
+  const reduced = useReducedMotion();
   const y1 = useTransform(scrollY, [0, 400], [0, -60]);
   const y2 = useTransform(scrollY, [0, 400], [0, -30]);
   const opacity = useTransform(scrollY, [0, 300], [1, 0]);
 
   return (
     <section className="hero" id="home">
-      <motion.div className="hero-bg-orb hero-bg-orb-1" style={{ y: y1 }} />
-      <motion.div className="hero-bg-orb hero-bg-orb-2" style={{ y: y2 }} />
-      <motion.div className="hero-bg-grid" style={{ opacity }} />
+      <motion.div className="hero-bg-orb hero-bg-orb-1" style={{ y: reduced ? 0 : y1 }} />
+      <motion.div className="hero-bg-orb hero-bg-orb-2" style={{ y: reduced ? 0 : y2 }} />
+      <motion.div className="hero-bg-grid" style={{ opacity: reduced ? 1 : opacity }} />
       <div className="container hero-grid">
         <motion.div
           className="hero-content"

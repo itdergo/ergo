@@ -14,15 +14,16 @@ import { asset, srcSet } from "@/lib/types";
 import { ScrollReveal } from "@/lib/site-ui-primitives";
 import { projectFolders } from "@/lib/project-data";
 import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 
 export function ProjectsSection() {
   return (
     <ScrollReveal>
-      <section className="section" id="projects">
+      <section className="section section-muted section--sm" id="projects">
         <div className="container">
           <div className="section-head">
             <span className="section-label">Projects</span>
-            <h2 className="section-heading">Featured installations.</h2>
+            <h2 className="section-heading section-heading--md">Featured installations.</h2>
             <p className="section-intro">
               A selection of recent ERGO installations across the Philippines.
             </p>
@@ -46,7 +47,7 @@ export function ProjectsSection() {
                       // advertise a rung that was not generated (that renders blank).
                       srcSet={srcSet("projects/" + p.image)}
                       type="image/webp"
-                      sizes="(max-width: 768px) 50vw, 20vw"
+                      sizes="(max-width: 768px) 50vw, 25vw"
                     />
                     <img
                       src={asset("projects/" + p.image)}
@@ -62,6 +63,9 @@ export function ProjectsSection() {
               </motion.a>
             ))}
           </div>
+          <a className="text-link section-cta" href="#contact">
+            See how we work <ArrowRight size={15} />
+          </a>
         </div>
       </section>
     </ScrollReveal>

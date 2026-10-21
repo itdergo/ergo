@@ -59,8 +59,15 @@
     <!-- Performance: font preconnects -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!--
+      Fonts are loaded HERE only. index.css used to carry its own
+      `@import url(...fonts.googleapis.com...)`, which made the browser fetch the
+      font stylesheet twice (the CSS @import is resolved after the CSS file
+      itself is parsed, so the request is serialised behind it) and duplicated
+      the weight list, which drifted between the two copies.
+    -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
 
@@ -73,7 +80,10 @@
       if ("%MODE%" === "production") {
         var s = document.createElement("script");
         s.defer = true;
-        s.dataset.domain = "ergocontracts.com";
+        // Must match the site registered in Plausible. Every other reference
+        // to the production domain (canonical URL, og:url, routes.json,
+        // CORS_ORIGINS) uses ergo.com.ph.
+        s.dataset.domain = "ergo.com.ph";
         s.src = "https://plausible.io/js/script.js";
         document.head.appendChild(s);
       }

@@ -66,7 +66,7 @@ function LogoRow({ logos, reverse = false }: { logos: typeof partners; reverse?:
               <img
                 src={`/images/partners/${p.logo}`}
                 alt={`${p.name} logo`}
-                loading="eager"
+                loading="lazy"
                 decoding="async"
               />
             </picture>
@@ -84,11 +84,11 @@ export function PartnersSection() {
 
   return (
     <ScrollReveal>
-      <section className="section section-muted" id="partners">
+      <section className="section section--sm" id="partners">
         <div className="container">
           <div className="section-head">
             <span className="section-label">Partners</span>
-            <h2 className="section-heading">Our partners and clients.</h2>
+            <h2 className="section-heading section-heading--md">Our partners and clients.</h2>
             <p className="section-intro">
               From banks and universities to government agencies and global brands — the
               Philippines&rsquo; most trusted institutions choose ERGO.
