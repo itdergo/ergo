@@ -84,9 +84,13 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Install Chromium for prerender
+        run: cd frontend && npx playwright install --with-deps chromium
       - name: Build shared packages
         run: npm run build:shared
       - name: Build frontend
+        env:
+          CHROME_BIN: chromium
         run: npm run build:frontend
       - name: Check bundle sizes
         run: |
