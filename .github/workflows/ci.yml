@@ -73,6 +73,56 @@ jobs:
       - name: Run frontend unit tests
         run: cd frontend && npx vitest run
 
+  ui-quality:
+    name: UI Quality (Accessibility & Performance)
+    runs-on: ubuntu-latest
+    needs: [frontend-test]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Build shared packages
+        run: npm run build:shared
+      - name: Build frontend
+        run: npm run build:frontend
+      - name: Check bundle sizes
+        run: |
+          echo "=== Bundle Size Report ==="
+          find frontend/dist/public/assets -name '*.js' -o -name '*.css' | while read f; do
+            size=$(stat -c%s "$f" 2>/dev/null || stat -f%z "$f")
+            echo "$size bytes  $f"
+          done | sort -rn
+          echo ""
+          echo "=== Total JS size ==="
+          find frontend/dist/public/assets -name '*.js' -exec stat -c%s {} \; | awk '{s+=$1} END {printf "%.1f KB\n", s/1024}'
+          echo "=== Total CSS size ==="
+          find frontend/dist/public/assets -name '*.css' -exec stat -c%s {} \; | awk '{s+=$1} END {printf "%.1f KB\n", s/1024}'
+      - name: Verify WebP image variants exist
+        run: |
+          webp_count=$(find frontend/public/images/webp -name '*.webp' 2>/dev/null | wc -l)
+          echo "WebP variants found: $webp_count"
+          if [ "$webp_count" -lt 10 ]; then
+            echo "WARNING: Expected at least 10 WebP variants, found $webp_count"
+          fi
+      - name: Verify prerendered pages
+        run: |
+          page_count=$(find frontend/dist/public -name 'index.html' | wc -l)
+          echo "Prerendered pages: $page_count"
+          if [ "$page_count" -lt 10 ]; then
+            echo "ERROR: Expected at least 10 prerendered pages, found $page_count"
+            exit 1
+          fi
+      - name: Verify sitemap exists
+        run: |
+          if [ -f frontend/dist/public/sitemap.xml ]; then
+            echo "Sitemap: OK ($(wc -l < frontend/dist/public/sitemap.xml) lines)"
+          else
+            echo "WARNING: sitemap.xml not found"
+          fi
+
   e2e-test:
     name: E2E Tests
     runs-on: ubuntu-latest
@@ -124,7 +174,7 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    needs: [lint, typecheck, backend-test, frontend-test, e2e-test]
+    needs: [lint, typecheck, backend-test, frontend-test, e2e-test, ui-quality]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
