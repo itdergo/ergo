@@ -4,14 +4,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "npm run images:manifest && vite --config vite.config.ts --host 0.0.0.0",
-    "build": "npm run images:manifest && vite build --config vite.config.ts && node scripts/gen-sitemap.mjs && node scripts/prerender.mjs",
+    "dev": "npm run images:manifest && vite --config vite.config.js --host 0.0.0.0",
+    "build": "npm run images:manifest && vite build --config vite.config.js && node scripts/gen-sitemap.mjs && node scripts/prerender.mjs",
     "images:manifest": "node scripts/gen-image-manifest.mjs",
     "images:webp": "bash scripts/gen-webp-variants.sh",
     "sitemap": "node scripts/gen-sitemap.mjs",
     "prerender": "node scripts/prerender.mjs",
-    "serve": "vite preview --config vite.config.ts --host 0.0.0.0",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "serve": "vite preview --config vite.config.js --host 0.0.0.0"
   },
   "devDependencies": {
     "@ergo/api-client-react": "*",

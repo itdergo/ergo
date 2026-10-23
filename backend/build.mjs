@@ -1,7 +1,7 @@
 /**
  * Backend build script — bundles the Express API server into a single ESM file.
  *
- * Uses esbuild to transpile and bundle TypeScript source from src/index.ts
+ * Uses esbuild to transpile and bundle TypeScript source from src/index.js
  * into dist/index.mjs. Externalizes native/unbundleable dependencies and
  * injects a CJS-compatibility banner so that CommonJS packages (e.g. express)
  * work correctly in the ESM output.
@@ -32,7 +32,7 @@ async function buildAll() {
   await rm(distDir, { recursive: true, force: true });
 
   await esbuild({
-    entryPoints: [path.resolve(artifactDir, "src/index.ts")],
+    entryPoints: [path.resolve(artifactDir, "src/index.js")],
     platform: "node",
     bundle: true,
     format: "esm",

@@ -4,8 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "seed": "node --env-file-if-exists=../.env --import tsx ./src/seed.ts",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "seed": "node --env-file-if-exists=../.env ./src/seed.js"
   },
   "dependencies": {
     "@ergo/database": "*"

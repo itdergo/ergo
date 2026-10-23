@@ -61,7 +61,7 @@ export default [
   },
   {
     // TypeScript files — uses @typescript-eslint parser and recommended rules
-    files: ["**/*.{ts,tsx}"],
+    files: ["**/*.{js,jsx}"],
     languageOptions: {
       parser: tsparser,
       parserOptions: { ecmaVersion: "latest", sourceType: "module", ecmaFeatures: { jsx: true } },
@@ -100,10 +100,10 @@ export default [
   {
     // Node-only packages — adds Node.js-specific globals (Buffer, __dirname, require, etc.)
     files: [
-      "backend/**/*.{ts,tsx}",
-      "database/**/*.{ts,tsx}",
-      "scripts/**/*.{ts,tsx}",
-      "shared/**/*.{ts,tsx}",
+      "backend/**/*.{js,jsx}",
+      "database/**/*.{js,jsx}",
+      "scripts/**/*.{js,jsx}",
+      "shared/**/*.{js,jsx}",
     ],
     languageOptions: {
       globals: {
@@ -124,7 +124,7 @@ export default [
   },
   {
     // Browser-only (frontend) — adds DOM and browser API globals
-    files: ["frontend/**/*.{ts,tsx}"],
+    files: ["frontend/**/*.{js,jsx}"],
     languageOptions: {
       globals: {
         window: "readonly",
@@ -154,7 +154,7 @@ export default [
     // React-specific rules — applies only to frontend files
     // Uses the new JSX transform (no need to import React)
     // Includes React Hooks rules (exhaustive-deps, etc.)
-    files: ["frontend/**/*.{ts,tsx}"],
+    files: ["frontend/**/*.{js,jsx}"],
     ...react.configs.flat.recommended,
     ...react.configs.flat["jsx-runtime"],
     plugins: { react, "react-hooks": reactHooks },
