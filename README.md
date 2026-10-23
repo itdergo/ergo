@@ -4,12 +4,12 @@ A fullstack web application for ERGO Contracts Philippines — thoughtfully desi
 
 ## Tech Stack
 
-- **Frontend**: Vite + React 19 + TypeScript + Tailwind CSS 4
-- **UI Components**: shadcn-ui, Radix UI, Lucide React, Framer Motion, Recharts, Sonner
-- **Backend**: Express 5 + Drizzle ORM + PGlite (embedded PostgreSQL)
-- **Database**: PostgreSQL via PGlite (no external DB required)
-- **API**: OpenAPI-first with Zod schemas + Orval code generation
-- **Build**: `npm run build` → libs + frontend; `npm run dev` → concurrently front + back
+- **Frontend**: Vite + React 19 (**JSX**, no TypeScript) + Tailwind CSS 4 + wouter + Framer Motion + Lucide React
+- **Backend**: Express 5 (ESM) + Drizzle ORM + node-postgres (`pg`)
+- **Database**: PostgreSQL (Drizzle ORM, schema-first)
+- **Auth**: JWT (`jsonwebtoken`) + `scrypt` password hashing, legacy SHA-256 upgrade
+- **API**: OpenAPI-first; Zod schemas (`@ergo/api-zod`) generated from `shared/api-spec/openapi.yaml` via Orval
+- **Build**: `npm run build` → `build:api` (esbuild) + `build:frontend` (Vite + prerender); `npm run dev` → concurrently front + back
 
 ## Quick Start
 
@@ -27,17 +27,21 @@ npm run dev
 | Script              | Description                                                            |
 | ------------------- | ---------------------------------------------------------------------- |
 | `npm run dev`       | Start concurrently: `npm run dev:api` + `npm run dev:frontend`         |
-| `npm run build`     | Full build: `build:libs` + `build:api` + `build:frontend`              |
-| `npm run typecheck` | Type-check both frontend and API                                       |
+| `npm run build`     | Full build: `build:api` + `build:frontend`                             |
+| `npm run verify`    | lint + build (CI gate)                                                 |
 | `npm run seed`      | Seed the database with admin user + categories + products + industries |
-| `npm run db:push`   | Push schema to the embedded PGlite database                            |
+| `npm run db:push`   | Push the Drizzle schema to the database                                |
+| `npm run db:generate`| Generate Drizzle migrations                                           |
+| `npm run test`      | Backend unit + frontend unit + e2e                                     |
+| `npm run lint` / `lint:fix` | ESLint (flat config)                                        |
+| `npm run format`    | Prettier write                                                         |
 
 ## Environment Variables
 
 Copy `.env.example` and adjust as needed:
 
 ```env
-DATABASE_URL=postgresql://ergo:***@localhost:5432/ergo_contracts
+DATABASE_URL=postgresql://user:pass@localhost:5432/ergo_contracts
 PORT=5000
 NODE_ENV=development
 VITE_API_URL=http://localhost:5000/api
@@ -48,17 +52,20 @@ ADMIN_PASSWORD=
 BASE_PATH=/
 ```
 
+`JWT_SECRET` must be set and be at least 32 characters — the API refuses to start otherwise.
+
 ## Project Structure
 
 ```
-ERGOContractsWEBV1/
+ergo-main/
 ├── frontend/          ← Vite + React 19 web app (nginx in prod)
 ├── backend/           ← Express 5 API (+ Redis cache, helmet, graceful shutdown)
 ├── database/          ← Drizzle ORM schema + migrations (Postgres)
-├── shared/            ← Shared workspace packages (api-zod, api-client-react, api-spec)
+├── shared/            ← Shared workspace packages (api-zod, api-spec)
 ├── scripts/           ← Database seed script
-├── infra/             ← Dockerfiles, docker-compose, nginx config
-├── .github/workflows/ ← CI/CD (lint, typecheck, build, docker)
+├── infra/             ← Dockerfiles, docker-compose, nginx config, cPanel .htaccess
+├── .github/workflows/ ← CI/CD (lint, tests, build, bundle budgets, security, docker)
+├── docs/              ← Architecture + code review
 ├── .env.example       ← Environment template (DO NOT commit real creds)
 └── package.json       ← npm workspaces monorepo root
 ```
@@ -74,18 +81,11 @@ ERGOContractsWEBV1/
 
 Redis is optional — the backend runs without it and uses it for caching when `REDIS_URL` is set.
 
-## Available Scripts
+## Security
 
-| Script                            | Description                                  |
-| --------------------------------- | -------------------------------------------- |
-| `npm run dev`                     | Run frontend + backend concurrently          |
-| `npm run build`                   | Build shared → database → backend → frontend |
-| `npm run lint` / `lint:fix`       | ESLint (flat config)                         |
-| `npm run typecheck`               | Type-check frontend + backend                |
-| `npm run format`                  | Prettier write                               |
-| `npm run verify`                  | lint + typecheck + build (CI gate)           |
-| `npm run seed`                    | Seed the database                            |
-| `npm run db:push` / `db:generate` | Drizzle schema push / migrations             |
+- **API**: helmet (CSP, HSTS, framing, referrer policy), CORS origin allowlist, layered rate limiting (global + auth + public write), JWT with issuer/TTL, `scrypt` password hashing, Zod validation on every write, parameterized Drizzle queries, path-traversal guard on uploads.
+- **Frontend**: `Content-Security-Policy` (script-src pins the inline Plausible loader by SHA-256 hash — no `unsafe-inline` for scripts), `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, HSTS (cPanel).
+- **No secrets in the repo** — `.env` is gitignored; `.env.example` holds placeholders only.
 
 ## Docker
 
@@ -109,15 +109,18 @@ Cache-Control; inquiries and auth responses are `no-store`.
 | `GET /api/products`         | List products with pagination/filtering |
 | `GET /api/products/:slug`   | Get single product                      |
 | `POST /api/products`        | Create product (admin)                  |
-| `PUT /api/products/:id`     | Update product (admin)                  |
+| `PATCH /api/products/:id`   | Update product (admin)                  |
 | `DELETE /api/products/:id`  | Delete product (admin)                  |
 | `GET /api/industries`       | List industries                         |
 | `GET /api/resources`        | List resources                          |
 | `GET /api/solutions`        | List solutions                          |
 | `GET /api/inquiries`        | List inquiries (admin)                  |
 | `POST /api/inquiries`       | Submit inquiry (public)                 |
-| `PUT /api/inquiries/:id`    | Update inquiry status (admin)           |
+| `PATCH /api/inquiries/:id`  | Update inquiry status (admin)           |
 | `DELETE /api/inquiries/:id` | Delete inquiry (admin)                  |
+| `GET /api/ai/employees`     | List AI employees (public)              |
+| `GET /api/ai/tasks`         | List AI tasks (admin)                   |
+| `POST /api/ai/tasks`        | Create AI task (admin)                  |
 
 ## SEO & routing
 
@@ -149,7 +152,7 @@ The build runs three steps:
    nginx serves those files via its existing `try_files $uri $uri/ /index.html`.
 
 Structured data (Organization, LocalBusiness, WebSite, BreadcrumbList, ItemList,
-Product) is injected per route by `src/lib/structured-data.ts` and baked into the
+Product) is injected per route by `src/lib/structured-data.js` and baked into the
 prerendered HTML.
 
 Prerendering needs a Chromium binary and a reachable API at build time:
@@ -163,8 +166,8 @@ crawlers just receive the shell), so a bare CI runner will not fail the build.
 
 ## Deployment
 
-The application is designed to run with **PGlite** (embedded PostgreSQL in the browser/node), so no external database is required for development. For production, replace the `DATABASE_URL` with a managed PostgreSQL connection string.
+The app connects to a **real PostgreSQL** database via `node-postgres` (`pg`). For local development the repo's scripts assume a Postgres instance (see `.env.example`); point `DATABASE_URL` at any managed PostgreSQL for production.
 
 ---
 
-Built with modern fullstack practices — TypeScript throughout, API-first with OpenAPI/orval, shadcn-ui components, and proper env hygiene.
+Built with modern fullstack practices — JavaScript throughout, API-first with OpenAPI/Orval, accessible/performant React frontend, and proper env hygiene.

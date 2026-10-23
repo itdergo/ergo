@@ -2139,6 +2139,13 @@ h4 {
 }
 
 /* Admin Panel */
+.admin-boot {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  color: var(--muted-foreground, #6b7280);
+  font-size: 0.95rem;
+}
 .admin-sidebar {
   width: 264px;
   background: white;

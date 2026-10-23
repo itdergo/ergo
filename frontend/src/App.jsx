@@ -5,8 +5,16 @@ import { api } from "@/lib/api";
 import { SiteProvider } from "@/lib/site-context";
 import { SiteLayout } from "@/components/site-layout";
 import { CustomCursor, Grain } from "@/components/fx";
-import { LoginPage, AdminPanel } from "@/components/admin/admin-panel";
 import { HomePage } from "@/pages/home";
+// Admin UI is lazy-loaded so it never ships in the public site chunk. The
+// public bundle only includes the login shell; the full panel is fetched on
+// demand, and the API still enforces auth server-side regardless.
+const LoginPage = lazy(
+  () => import("@/components/admin/admin-panel").then((m) => ({ default: m.LoginPage }))
+);
+const AdminPanel = lazy(
+  () => import("@/components/admin/admin-panel").then((m) => ({ default: m.AdminPanel }))
+);
 const ProductsPage = lazy(
   () => import("@/pages/products").then((m) => ({ default: m.ProductsPage }))
 );
@@ -55,11 +63,13 @@ function App() {
     setIsAdmin(false);
     setCurrentView("site");
   };
-  if (currentView === "login") {
-    return /* @__PURE__ */ jsx(LoginPage, { onLogin: handleLogin, onBack: () => setCurrentView("site") });
-  }
-  if (currentView === "admin" && isAdmin) {
-    return /* @__PURE__ */ jsx(AdminPanel, { onLogout: handleLogout, onViewSite: () => setCurrentView("site") });
+  // Admin views are lazy-loaded; a Suspense boundary lets the admin chunk load
+  // without unmounting the app. The fallback keeps a minimal shell on screen.
+  if (currentView === "login" || (currentView === "admin" && isAdmin)) {
+    return /* @__PURE__ */ jsxs(Suspense, { fallback: /* @__PURE__ */ jsx("div", { className: "admin-boot", children: "Loading\u2026" }), children: [
+      currentView === "login" && /* @__PURE__ */ jsx(LoginPage, { onLogin: handleLogin, onBack: () => setCurrentView("site") }),
+      currentView === "admin" && isAdmin && /* @__PURE__ */ jsx(AdminPanel, { onLogout: handleLogout, onViewSite: () => setCurrentView("site") })
+    ] });
   }
   return (
     // Public site view: wrapped in Router + SiteProvider + SiteLayout

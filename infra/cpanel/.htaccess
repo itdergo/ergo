@@ -23,11 +23,11 @@
   #
   #   (a) Node app on a cPanel subdomain via Passenger (recommended):
   RewriteRule ^api/(.*)$     https://api.ergo.com.ph/api/$1     [P,L,QSA]
-  RewriteRule ^uploads/(.*)$ https://api.ergo.com.ph/uploads/$1 [P,L,QSA]
+  RewriteRule ^uploads/(.*)$ https://api.ergo.com.ph/api/uploads/$1 [P,L,QSA]
   #
   #   (b) Node app listening on a local port (standalone / Passenger port):
   # RewriteRule ^api/(.*)$     http://127.0.0.1:5000/api/$1     [P,L,QSA]
-  # RewriteRule ^uploads/(.*)$ http://127.0.0.1:5000/uploads/$1 [P,L,QSA]
+  # RewriteRule ^uploads/(.*)$ http://127.0.0.1:5000/api/uploads/$1 [P,L,QSA]
   #
   # If mod_proxy is disabled by your host these rules return 500. In that case
   # drop them and instead point `API_BASE` in frontend/src/lib/api.ts at the API
@@ -85,6 +85,13 @@
   Header always set X-Frame-Options "SAMEORIGIN"
   Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
   Header always set Cross-Origin-Opener-Policy "same-origin"
+
+  # Content-Security-Policy — same policy as infra/nginx.conf. script-src
+  # pins the prerendered inline Plausible loader by SHA-256 hash (no
+  # 'unsafe-inline' for scripts); style-src allows inline styles because the
+  # contact section sets inline style objects; frame-src allows the Google Maps
+  # embed iframe. Regenerate the hash if the inline loader in index.html changes.
+  Header always set Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; script-src 'self' 'sha256-qjOiduFJoFma5ZnoIU1u7vg0uFA8SuZmoWEBSKGdGmI=' https://plausible.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self'; frame-src https://www.google.com; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests"
 
   # HSTS — only meaningful over HTTPS (section 1 forces the redirect), so guard
   # it on the TLS-terminated request. max-age 1 year + preload is safe here.

@@ -52,6 +52,9 @@ const JWT_SECRET = process.env["JWT_SECRET"];
 if (!JWT_SECRET) {
   throw new Error("JWT_SECRET is required. Set a long random value in the environment.");
 }
+if (JWT_SECRET.length < 32) {
+  throw new Error(`JWT_SECRET is too short (${JWT_SECRET.length} chars). Use at least 32 characters — generate one with: openssl rand -base64 48`);
+}
 const SECRET = JWT_SECRET;
 const TOKEN_TTL = process.env["JWT_TTL"] || "8h";
 const ISSUER = "ergo-api";

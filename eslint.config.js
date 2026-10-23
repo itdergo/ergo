@@ -1,19 +1,16 @@
-// @ts-check
-/**
- * ESLint flat configuration for the ERGO Contracts monorepo.
- *
- * Configures linting for:
- * - JavaScript/MJS build files (esbuild configs, scripts) with CJS globals
- * - TypeScript files across the monorepo with Node.js globals
- * - Node.js packages (backend, database, scripts, shared) with Node-specific globals
- * - Frontend React/TSX files with browser globals and React hooks rules
- *
- * Uses the new ESLint flat config format (eslint.config.js).
- * Uses @typescript-eslint parser for TypeScript files.
- * React rules are applied only to frontend files.
- *
- * Usage: npm run lint
- */
+// ESLint flat configuration for the ERGO Contracts monorepo.
+//
+// Configures linting for:
+// - JavaScript/MJS build files (esbuild configs, scripts) with CJS globals
+// - JavaScript/JSX source across the monorepo with Node.js globals
+// - Node.js packages (backend, database, scripts, shared) with Node-specific globals
+// - Frontend React files with browser globals and React hooks rules
+//
+// Uses the new ESLint flat config format (eslint.config.js).
+// Uses @typescript-eslint parser (applied to .js/.jsx) with Node/React globals.
+// React rules are applied only to frontend files.
+//
+// Usage: npm run lint
 import js from "@eslint/js";
 import tseslint from "@typescript-eslint/eslint-plugin";
 import tsparser from "@typescript-eslint/parser";
@@ -32,7 +29,6 @@ export default [
       "**/*.tsbuildinfo",
       "frontend/public/**",
       "shared/api-zod/src/generated/**",
-      "shared/api-client-react/src/generated/**",
       "infra/**",
     ],
   },

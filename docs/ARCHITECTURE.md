@@ -1,6 +1,6 @@
 # ErgoContractsWEB V1 — Architecture & Standards
 
-> A full-stack, TypeScript-first monorepo: **React 19 + Vite** SPA, **Express 5** API, **Drizzle ORM** on **PostgreSQL**, with a **shared, code-generated API contract** (`api-zod` + `api-client-react`) that keeps the frontend and backend strictly in sync.
+> A full-stack **JavaScript** monorepo: **React 19 + Vite** SPA (JSX), **Express 5** API, **Drizzle ORM** on **PostgreSQL** (node-postgres), with a shared, code-generated API contract (`api-zod`) that keeps validation consistent across the stack.
 
 This document is the canonical reference for the repository layout, the contracts between packages, the request/response flow, and the syntax and patterns used throughout the codebase.
 
@@ -10,55 +10,54 @@ This document is the canonical reference for the repository layout, the contract
 
 | Layer              | Technology                                                                                                   |
 | ------------------ | ------------------------------------------------------------------------------------------------------------ |
-| Frontend           | React 19, Vite 7, TypeScript, Tailwind CSS 4, shadcn/ui + Radix UI, Framer Motion, TanStack Query            |
-| Backend            | Node.js 24, Express 5, TypeScript, ESM, Pino logging                                                         |
-| Database           | PostgreSQL, Drizzle ORM (schema-first, type-inferred)                                                        |
+| Frontend           | React 19, Vite 7, JavaScript (JSX), Tailwind CSS 4, wouter, Framer Motion, Lucide React                       |
+| Backend            | Node.js, Express 5, JavaScript (ESM), esbuild, Pino logging                                                  |
+| Database           | PostgreSQL, Drizzle ORM (schema-first) + node-postgres (`pg`)                                                 |
 | Auth               | JWT (`jsonwebtoken`), `scrypt` password hashing (OWASP-recommended cost), legacy SHA-256 transparent upgrade |
 | Cache / Rate limit | Redis (optional; degrades to no-op when `REDIS_URL` is unset)                                                |
-| Validation         | Zod v4 — shared schemas are the single source of truth for the API contract                                  |
-| Build              | esbuild, Vite, Orval (OpenAPI → React Query hooks + Zod schemas), Drizzle Kit (migrations)                   |
-| DevOps             | npm workspaces, GitHub Actions CI, multi-stage Docker, nginx (static SPA + reverse proxy)                    |
+| Validation         | Zod v4 — `drizzle-zod` insert schemas are the single source of truth for write validation                    |
+| Build              | esbuild (backend), Vite (frontend), Orval (OpenAPI → Zod schemas), Drizzle Kit (migrations)                  |
+| DevOps             | npm workspaces, GitHub Actions CI, multi-stage Docker, nginx (static SPA + reverse proxy), cPanel `.htaccess`|
 
 ---
 
 ## 2. Directory map
 
 ```text
-ErgoContractsWEBV1/
-├── frontend/          # React SPA (dev :3000) + Vite build
-├── backend/           # Express API (dev :5000) + ESM build
-├── database/          # Drizzle schema + migrations + built `db` client
+ergo-main/
+├── frontend/          # React SPA (dev :3000) + Vite build → dist/public
+├── backend/           # Express API (dev :5000) + esbuild → dist/index.mjs
+├── database/          # Drizzle schema + migrations + `db` client (consumed from src)
 ├── shared/
-│   ├── api-zod/       # Runtime Zod schemas (single source of truth for validation)
-│   ├── api-client-react/  # Generated React Query hooks (Orval output)
+│   ├── api-zod/       # Runtime Zod schemas (Orval-generated from the spec)
 │   └── api-spec/      # OpenAPI 3.1 spec + Orval config (codegen root)
 ├── scripts/           # Database seed (idempotent)
-├── infra/             # Dockerfiles, docker-compose, nginx config
-├── .github/workflows/ # CI: lint, typecheck, build, docker
-└── docs/              # This file
+├── infra/             # Dockerfiles, docker-compose, nginx config, cPanel .htaccess
+├── .github/workflows/ # CI: lint, tests, build, bundle budgets, security, docker
+├── docs/              # This file + CODE-REVIEW.md
+└── package.json       # npm workspaces monorepo root
 ```
 
 ---
 
 ## 3. Package boundaries (workspace packages)
 
-The repo is an **npm workspaces** monorepo. Each directory is a separate package with its own `package.json` and `name`, but they resolve each other through the `tsconfig.json` **project references** in the root.
+The repo is an **npm workspaces** monorepo. Each directory is a separate package with its own `package.json` and `name`. Packages resolve each other through npm workspace symlinks (`node_modules/@ergo/*`) — there are **no `tsconfig.json` project references** (the repo is plain JavaScript; shared packages are consumed directly from `src/`).
 
-| Package                   | Name                     | Role                                                                  |
-| ------------------------- | ------------------------ | --------------------------------------------------------------------- |
-| `backend`                 | `@ergo/backend`          | Express HTTP server. Imports `@ergo/database` and `@ergo/api-zod`.    |
-| `database`                | `@ergo/database`         | Drizzle schema + the `db` client. **No HTTP logic whatsoever.**       |
-| `shared/api-zod`          | `@ergo/api-zod`          | Zod schemas (raw request/response bodies, query params).              |
-| `shared/api-client-react` | `@ergo/api-client-react` | React Query hooks + `customFetch` (generated by Orval).               |
-| `shared/api-spec`         | `@ergo/api-spec`         | OpenAPI YAML + Orval config. Update this, then run `npm run codegen`. |
-| `scripts`                 | `@ergo/scripts`          | Database seed script.                                                 |
+| Package          | Name              | Role                                                                 |
+| ---------------- | ----------------- | -------------------------------------------------------------------- |
+| `backend`        | `@ergo/backend`   | Express HTTP server. Imports `@ergo/database` and `@ergo/api-zod`.   |
+| `database`       | `@ergo/database`  | Drizzle schema + the `db` client. **No HTTP logic whatsoever.**      |
+| `shared/api-zod` | `@ergo/api-zod`   | Zod schemas generated by Orval from `openapi.yaml`.                 |
+| `shared/api-spec` | `@ergo/api-spec` | OpenAPI YAML + Orval config. Update this, then run `npm run codegen`.|
+| `scripts`        | `@ergo/scripts`   | Database seed script.                                                |
 
-**Rule:** the database layer never knows about HTTP, and the API layer never knows about React. Data types flow one way: `database → api-zod → database/frontend`.
+**Rule:** the database layer never knows about HTTP, and the API layer never knows about React.
 
 ### Dependency direction
 
 ```text
-frontend ──> api-client-react ──> api-spec (openapi.yaml)
+frontend ──> (own lib/api.js client)
 backend  ──> api-zod              ──> api-spec (openapi.yaml)
 backend  ──> database
 database ──> (none; pure schema + drizzle-orm)
@@ -78,10 +77,11 @@ Vite dev server :3000  (proxies /api → Express :5000; SPA fallback in prod)
 Express API :5000
   │
   ├─ 1. pino-http          → structured request/response logging (redacts auth headers)
-  ├─ 2. helmet             → security headers (CSP, HSTS, permissions policy)
-  ├─ 3. cors               → whitelist-based CORS (same-origin + no-Origin = allowed)
+  ├─ 2. helmet             → security headers (CSP, referrer policy, permissions policy)
+  ├─ 3. cors               → allowlist-based CORS (same-origin + no-Origin = allowed)
   ├─ 4. express.json/urlencoded → body parsing (1MB limit)
-  ├─ 5. /api rate limiter  → sliding-window (600 req / 15 min per IP)
+  ├─ 5. CSRF validation    → x-csrf-token required on non-GET (stateful, TTL'd)
+  ├─ 6. /api rate limiter  → sliding-window (600 req / 15 min per IP)
   ▼
 Route router (/products, /categories, /inquiries, ...)
   │
@@ -91,7 +91,7 @@ Route router (/products, /categories, /inquiries, ...)
   ▼
 Handler
   ├─ 1. Validate input with Zod (drizzle-zod insert schemas)
-  ├─ 2. Query Drizzle (typed, with relations)
+  ├─ 2. Query Drizzle (parameterized, with relations)
   ├─ 3. Serialize + `res.json()`
   ▼
 Response back to browser (with Cache-Control / no-store per route)
@@ -103,33 +103,33 @@ Response back to browser (with Cache-Control / no-store per route)
 
 | Variable                         | Required      | Where used                                       | Default                                       |
 | -------------------------------- | ------------- | ------------------------------------------------ | --------------------------------------------- |
-| `DATABASE_URL`                   | yes (runtime) | `database/src/index.ts` — `pg.Pool` + Drizzle    | —                                             |
-| `PORT`                           | yes (backend) | `backend/src/index.ts` — server listen port      | 5000                                          |
-| `REDIS_URL`                      | no            | `backend/src/lib/redis.ts` — cache client        | unset → cache disabled                        |
-| `JWT_SECRET`                     | yes (runtime) | `backend/src/lib/auth.ts` — HMAC secret          | —                                             |
-| `JWT_TTL`                        | no            | `backend/src/lib/auth.ts`                        | `8h`                                          |
-| `CORS_ORIGINS`                   | no            | `backend/src/app.ts` — comma-separated allowlist | `http://localhost:3000,http://localhost:5173` |
-| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | no (seed)     | `scripts/src/seed.ts`                            | auto-generated password printed once          |
-| `UPLOAD_DIR` / `MAX_FILE_SIZE`   | no            | `backend/src/routes/uploads.ts`                  | `uploads` / 10 MB                             |
-| `LOG_LEVEL`                      | no            | `backend/src/lib/logger.ts`                      | `info`                                        |
+| `DATABASE_URL`                   | yes (runtime) | `database/src/index.js` — `pg.Pool` + Drizzle    | —                                             |
+| `PORT`                           | yes (backend) | `backend/src/index.js` — server listen port      | 5000                                          |
+| `REDIS_URL`                      | no            | `backend/src/lib/redis.js` — cache client        | unset → cache disabled                        |
+| `JWT_SECRET`                     | yes (runtime) | `backend/src/lib/auth.js` — HMAC secret          | — (must be ≥ 32 chars)                        |
+| `JWT_TTL`                        | no            | `backend/src/lib/auth.js`                        | `8h`                                          |
+| `CSRF_TOKEN_TTL_MS`              | no            | `backend/src/middlewares/csrf.js`                | 3600000 (1h)                                  |
+| `CORS_ORIGINS`                   | no            | `backend/src/app.js` — comma-separated allowlist | `http://localhost:3000,...`                   |
+| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | no (seed)     | `scripts/src/seed.js`                            | auto-generated password printed once          |
+| `UPLOAD_DIR` / `MAX_FILE_SIZE`   | no            | `backend/src/routes/uploads.js`                  | `uploads` / 10 MB                             |
+| `LOG_LEVEL`                      | no            | `backend/src/lib/logger.js`                      | `info`                                        |
 
 > `.env` is git-ignored; `.env.example` is the committed template. Never commit real credentials.
 
 ## 6. Key syntax & patterns (by layer)
 
-### 6.1 The monorepo + TypeScript project references
+### 6.1 The monorepo (JavaScript, no type-checking step)
 
-The root `tsconfig.json` holds `references` to every package. TypeScript builds them in dependency order, so `shared/api-zod` and `database` are compiled before `backend`. The `moduleResolution: "bundler"` + `paths`/`aliases` config lets each package `import ... from "@ergo/database"` while TypeScript still resolves the local source.
+The repo is **plain JavaScript** — `.js` / `.jsx` throughout, no `tsconfig.json`, no `typecheck` script. The backend bundles with esbuild (entry `backend/src/index.js`); the frontend builds with Vite (entry `frontend/src/main.jsx`). Shared packages are consumed directly from their `src/` directories (their `package.json` `exports` point at `./src/index.js`), so no build step is needed for them.
 
 ### 6.2 ESM + `type: module`
 
-Every package sets `"type": "module"`. The backend compiles to `backend/dist/index.mjs` (esbuild output), executed as `node backend/dist/index.mjs`. Imports use the `.js`/`.mjs` extension convention where required by Node; tsx/esbuild handles dev-time resolution (Vite for frontend, esbuild for backend).
+Every package sets `"type": "module"`. The backend compiles to `backend/dist/index.mjs`, executed as `node backend/dist/index.mjs`. Imports use the `.js`/`.mjs` extension convention where required by Node; esbuild handles dev-time resolution (Vite for frontend, esbuild for backend).
 
-### 6.3 Drizzle ORM — schema-first, type-inferred
+### 6.3 Drizzle ORM — schema-first
 
-`database/src/schema/index.ts` defines every table with `pgTable`, plus `pgEnum` for `user_role`, `inquiry_status`, `product_status`. Drizzle derives:
+`database/src/schema/index.js` defines every table with `pgTable`, plus `pgEnum` for `user_role`, `inquiry_status`, `product_status`. The schema generates:
 
-- `$inferSelect` / `$inferInsert` types → used as `type User = typeof users.$inferSelect`.
 - **Insert schemas** via `drizzle-zod` (`createInsertSchema(...)`) → these are the exact validation schemas the API uses, so the database and the API can never disagree on shape. Server-managed columns (`id`, `createdAt`, `updatedAt`, and in the case of `inquiries`, `status`/`assignedTo`/`notes`) are explicitly `.omit()`'d so clients can't spoof them.
 
 ### 6.4 Zod validation at the API boundary
@@ -138,38 +138,39 @@ The API handlers validate incoming bodies with `insertProductSchema.safeParse(re
 
 ### 6.5 Express middleware chain & error handling
 
-Requests pass through a **fixed ordered middleware stack** in `backend/src/app.ts`:
+Requests pass through a **fixed ordered middleware stack** in `backend/src/app.js`:
 
 1. `pino-http` (logging)
 2. `helmet` (security headers)
 3. `cors`
 4. `express.json` / `express.urlencoded` (body parsing)
-5. `/api` rate limiter → router
+5. CSRF token validation
+6. `/api` rate limiter → router
 
-**Route handlers never swallow errors with `try/catch` + `console.error`.** Instead they either:
-
-- return a typed response directly (`400`, `404`, `409`), or
-- throw `HttpError` (status + optional `code`) and let it propagate to the **central error handler** at the bottom of `app.ts` (which logs with pino and returns a sanitized JSON body for `5xx`, while preserving the message for `4xx`).
-
-`asyncHandler`-style wrappers exist in `backend/src/lib/errors.ts` for wrapping async handlers so promise rejections land in `next(err)`.
+Handlers return typed responses directly (`400`, `404`, `409`) and let a **central error handler** at the bottom of `app.js` (logs with pino, returns a sanitized JSON body for `5xx`, preserves the message for `4xx`) handle anything unexpected.
 
 ### 6.6 JWT + scrypt
 
-`backend/src/lib/auth.ts`:
+`backend/src/lib/auth.js`:
 
 - `hashPassword` / `verifyPassword` use **scrypt** (`N=16384, r=8, p=1`, OWASP minimum) with a random 16-byte salt, stored as `scrypt$N$r$p$<salt>$<hash>`.
-- `timingSafeEqual` prevents timing attacks on both hash and JWT comparison.
+- `timingSafeEqual` prevents timing attacks.
 - Legacy SHA-256 hashes are detected (`isLegacyHash`) and transparently re-hashed to scrypt on next login (migration).
 - `signToken` / `verifyToken` produce HS256 JWTs with `sub`, `email`, `role`, `name`, an `issuer`, and `expiresIn`. `verifyToken` enforces the issuer and returns `null` for invalid tokens, so `requireAuth` can uniformly return `401`.
+- `JWT_SECRET` must be set and **at least 32 characters** — the process refuses to start otherwise.
 
-### 6.7 Caching & rate limiting (best-effort)
+### 6.7 CSRF protection (stateful, TTL'd)
 
-- `backend/src/lib/redis.ts` — lazy-singletons `cacheGet`/`cacheSet`/`cacheDel`/`cacheAside`. `redisEnabled` flips at runtime; **Redis is optional** and the app runs fully without it. Errors are logged, never thrown.
-- `backend/src/middlewares/rateLimit.ts` — `express-rate-limit` limiters: `apiLimiter` (600/15min), `authLimiter` (10/15min, skips successful requests to avoid penalizing typos), `publicWriteLimiter` (5/10min for inquiries). Note: these are **in-memory**; for multi-instance deployments they should be backed by Redis (`rate-limit-redis`).
+`backend/src/middlewares/csrf.js` stores CSRF tokens in-process with a TTL (default 1h). `validateCsrfToken` skips safe methods (`GET`/`HEAD`/`OPTIONS`), requires an `x-csrf-token` header on everything else, and rejects expired or mismatched tokens. A periodic sweep evicts stale entries so the Map does not grow unbounded. On multi-instance deployments, back this with Redis.
 
-### 6.8 Frontend: routing + data loading
+### 6.8 Caching & rate limiting (best-effort)
 
-`frontend/src/App.tsx` uses `wouter` (small, hook-based router). Routes are split via `React.lazy` + `Suspense` so the initial bundle only contains the home page + layout. The public site is wrapped in three providers:
+- `backend/src/lib/redis.js` — lazy-singletons `cacheGet`/`cacheSet`/`cacheDel`/`cacheAside`. `redisEnabled` flips at runtime; **Redis is optional** and the app runs fully without it. Errors are logged, never thrown.
+- `backend/src/middlewares/rateLimit.js` — `express-rate-limit` limiters: `apiLimiter` (600/15min), `authLimiter` (10/15min, skips successful requests to avoid penalizing typos), `publicWriteLimiter` (5/10min for inquiries). These are **in-memory**; for multi-instance deployments they should be backed by Redis (`rate-limit-redis`).
+
+### 6.9 Frontend: routing + data loading
+
+`frontend/src/App.jsx` uses `wouter` (small, hook-based router). Routes are split via `React.lazy` + `Suspense` so the initial bundle only contains the home page + layout. The public site is wrapped in providers:
 
 ```text
 <Router>
@@ -181,25 +182,30 @@ Requests pass through a **fixed ordered middleware stack** in `backend/src/app.t
 </Router>
 ```
 
-The admin login/login views and `AdminPanel` are rendered conditionally based on the stored token, **not** routed separately.
+The **admin views** (`LoginPage`, `AdminPanel`) are also lazy-loaded and rendered conditionally based on the stored token — the full admin panel is **not** part of the public chunk. The admin login shell is only reachable from the dev-gated admin launcher and the API still enforces auth server-side.
 
-### 6.9 `SiteProvider` (React Context)
+### 6.10 `SiteProvider` (React Context)
 
-`frontend/src/lib/site-context.tsx` is the app's global state: it fetches categories + products in parallel (critical path) and industry/solutions/resources after a 500 ms delay (secondary path, to keep the above-the-fold content fast). Derived state (`filteredProducts`) is memoized with `useMemo`. All pages consume it via the `useSite()` hook, which throws a clear error if used outside the provider.
+`frontend/src/lib/site-context.jsx` is the app's global state: it fetches categories + products in parallel (critical path) and industry/solutions/resources after a 500 ms delay (secondary path, to keep the above-the-fold content fast). Derived state (`filteredProducts`) is memoized with `useMemo`. All pages consume it via the `useSite()` hook, which throws a clear error if used outside the provider.
 
-### 6.10 SEO + structured data (JSON-LD)
+### 6.11 API client
 
-`frontend/src/lib/seo.ts` + `structured-data.ts` write per-route `<title>`, description, canonical, Open Graph, and Twitter meta tags, and inject `Organization` / `LocalBusiness` / `WebSite` / `BreadcrumbList` / `ItemList` / `Product` JSON-LD. `src/routes.json` is the **single source of truth** for routes and drives both the app router and the sitemap/prerender build steps.
+`frontend/src/lib/api.js` is a small `fetch` wrapper: it reads the JWT from `localStorage`, injects `Authorization: Bearer` and `X-CSRF-Token` headers on writes, and throws a typed `Error` on non-2xx. All page/section data goes through this client.
 
-### 6.11 The shared fetch client (`customFetch`)
+### 6.12 SEO + structured data (JSON-LD)
 
-`shared/api-client-react/src/custom-fetch.ts` is a drop-in `fetch` wrapper that resolves a base URL, injects a bearer token via an `AuthTokenGetter`, auto-detects JSON vs text vs blob, and throws typed `ApiError` on non-2xx. It is the function Orval's generated hooks call, so the whole client is consistent.
+`frontend/src/lib/seo.js` + `structured-data.js` write per-route `<title>`, description, canonical, Open Graph, and Twitter meta tags, and inject `Organization` / `LocalBusiness` / `WebSite` / `BreadcrumbList` / `ItemList` / `Product` JSON-LD. `src/routes.json` is the **single source of truth** for routes and drives both the app router and the sitemap/prerender build steps.
 
-### 6.12 Dockerfile (multi-stage)
+### 6.13 Security headers
 
-- `Dockerfile` — builds the backend workspace (`shared` → `database` → `backend`), then a `production` stage copies only `dist` outputs + `node_modules` and runs `node backend/dist/index.mjs`.
-- `Dockerfile.frontend` — builds the frontend with Vite, then an `nginx:alpine` stage serves `dist/public` and proxies `/api` + `/uploads` to the `api` service.
-- `docker-compose.yml` — runs `api` (5000), `frontend` (3000→80), `db` (5432), `redis` (6379) with healthchecks and named volumes.
+- **Frontend (nginx / `.htaccess`):** `Content-Security-Policy` (script-src pins the prerendered inline Plausible loader by SHA-256 hash — no `unsafe-inline` for scripts; `frame-src` allows the Google Maps embed), `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, COOP, HSTS (cPanel).
+- **Backend (helmet):** CSP, referrer policy, permissions policy.
+
+### 6.14 Dockerfiles (multi-stage)
+
+- `infra/Dockerfile` — installs workspace deps, builds the backend with esbuild (bundling `@ergo/database` + `@ergo/api-zod` into `backend/dist/index.mjs`), then a `production` stage copies only `dist` + `node_modules` and runs `node backend/dist/index.mjs`.
+- `infra/Dockerfile.frontend` — builds the frontend with Vite, then an `nginx:alpine` stage serves `dist/public` and proxies `/api` + `/uploads` to the `api` service.
+- `infra/docker-compose.yml` — runs `api` (5000), `frontend` (80), `db` (5432), `redis` (6379) with healthchecks and named volumes.
 
 ---
 
@@ -207,25 +213,24 @@ The admin login/login views and `AdminPanel` are rendered conditionally based on
 
 | Command                                            | Action                                                                                      |
 | -------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| `npm run dev`                                      | `concurrently` — `dev:api` (backend build+run) + `dev:frontend` (Vite)                      |
+| `npm run dev`                                      | `concurrently` — `dev:api` (backend) + `dev:frontend` (Vite)                                |
 | `npm run dev:api`                                  | `npm run dev -w backend`                                                                    |
 | `npm run dev:frontend`                             | `npm run dev -w frontend`                                                                   |
-| `npm run build`                                    | `shared` → `database` → `backend` → `frontend`                                              |
+| `npm run build`                                    | `build:api` (esbuild) → `build:frontend` (Vite + sitemap + prerender)                       |
 | `npm run start`                                    | `npm run start -w backend`                                                                  |
 | `npm run seed`                                     | Populates the database (admin + categories + products + industries + solutions + resources) |
 | `npm run db:push` / `db:generate`                  | Drizzle schema push / migration generation                                                  |
-| `npm run lint` / `format` / `typecheck` / `verify` | ESLint, Prettier, tsc (frontend+backend), CI gate                                           |
-| `npm run codegen`                                  | Orval from `shared/api-spec` (regenerates both shared packages)                             |
+| `npm run lint` / `format` / `verify`               | ESLint, Prettier, lint+build (CI gate)                                                       |
+| `npm run test`                                     | Backend unit + frontend unit + e2e                                                          |
+| `npm run codegen`                                  | Orval from `shared/api-spec` (regenerates `api-zod`)                                        |
 
 ---
 
 ## 8. Known gaps & roadmap (owned items)
 
-These are the honest "not yet done" items in an otherwise complete stack. Each has a concrete fix.
-
-1. **In-memory rate limiters.** `rate-limit.ts` is fine for a single instance. For multi-instance/Docker, swap to `rate-limit-redis` so counts are shared across replicas.
-2. **Uploads route uses base64-in-body.** The `uploads.ts` POST accepts base64 payloads. Production-grade multipart should use `multer` or an object storage SDK (`@aws-sdk/s3-request-presigner`). Note in the route docstring ("In production, use multer…").
-3. **Uploads filename delivery is a generated UUID.** The client never uploads a real filename; the server generates one. This is acceptable, but if clients need the original name for display, store it in the DB `uploads` table and return it from the create handler.
-4. **Admin session has no refresh token.** `auth.ts` issues a short-lived JWT and stores it in `localStorage`. A refresh token or httpOnly cookie would reduce XSS risk at the cost of CSRF complexity; out of scope for V1.
-5. **Prerender/Chromium dependency.** `frontend` build's prerender step skips cleanly (with a warning) if Chromium is absent, so a bare CI runner won't fail — but the SEO HTML is only present when Chromium is available. Document this tradeoff in the README.
-6. **Codegen is manual.** `shared/api-spec` ships with generated files committed. The `.prettierrc` ignores the generated dirs, but `npm run codegen` should ideally run in CI/precommit to guarantee the spec and generated output stay in sync.
+1. **In-memory rate limiters.** `rateLimit.js` is fine for a single instance. For multi-instance/Docker, swap to `rate-limit-redis` so counts are shared across replicas.
+2. **CSRF store is in-process.** Same multi-instance caveat — back it with Redis if you scale out.
+3. **Admin session is a JWT in `localStorage`.** A refresh token or httpOnly cookie would reduce XSS risk at the cost of CSRF complexity; out of scope for V1.
+4. **Prerender/Chromium dependency.** The frontend build's prerender step skips cleanly (with a warning) if Chromium is absent, so a bare CI runner won't fail — but the SEO HTML is only present when Chromium is available.
+5. **Codegen is manual.** `shared/api-spec` ships with generated files committed. `npm run codegen` should ideally run in CI/precommit to guarantee the spec and generated output stay in sync.
+6. **Route-level API tests are thin.** Unit tests cover `lib`/`middleware`; route handlers are covered mainly by the e2e suite. Adding integration tests per route would tighten coverage.

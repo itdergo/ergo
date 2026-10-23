@@ -9,8 +9,5 @@
   "dependencies": {
     "@ergo/database": "*"
   },
-  "devDependencies": {
-    "@types/node": "^25.3.3",
-    "tsx": "^4.21.0"
-  }
+  "devDependencies": {}
 }

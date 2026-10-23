@@ -181,3 +181,19 @@ The API client persists the token in `localStorage` (`frontend/src/lib/api.js`).
 ## 8. Conclusion
 
 The codebase is **well-built and security-aware**, and the JS conversion is clean and verified. Two deployment-blocking bugs (CSP absence, upload path mismatch) and a set of stale artifacts are the priority. None of the findings indicate a live compromise — the server-side auth, validation, and query layers are correct. Fix H1/H2, clean up M4/M5, and this is a strong, shippable build.
+
+## 9. Resolution status (continuation pass)
+
+The following findings were resolved in the continuation pass:
+
+- **H1 (CSP)** — RESOLVED. Added a CSP to `infra/nginx.conf` and `infra/cpanel/.htaccess` (script-src pins the inline Plausible loader by SHA-256 hash — no `unsafe-inline` for scripts; `frame-src` allows the Google Maps embed). Validated with 0 violations against the prerendered site.
+- **H2 (upload path)** — RESOLVED. Fixed `/uploads` → `/api/uploads` in both nginx and `.htaccess` (and the commented local-port option).
+- **M1 (admin bundle)** — RESOLVED. `LoginPage`/`AdminPanel` are now `React.lazy`-loaded; admin panel is a separate chunk (23.6 KB) and is not in the public bundle.
+- **M3 (JWT secret strength)** — RESOLVED. `backend/src/lib/auth.js` now rejects secrets shorter than 32 chars at startup.
+- **M4 (dead deps)** — RESOLVED. Removed `@electric-sql/pglite` (backend + database), `@ergo/api-client-react` + `@tanstack/react-query`, all `@types/*`, `tsx`, redundant root-level `framer-motion`/`helmet`/`redis`, and the `shared/api-client-react` workspace (deleted). Updated `orval.config.js` and eslint ignores. 159 packages removed.
+- **M5 (docs)** — RESOLVED. Rewrote `README.md` and `docs/ARCHITECTURE.md` to reflect JavaScript + node-postgres + the current scripts.
+- **L4 (CSRF TTL)** — RESOLVED. `csrfTokens` now stores `{ userId, expiresAt }` with a 1h TTL and a periodic unref'd sweep.
+- **L7 (esbuild artifacts)** — partially addressed in `eslint.config.js` (removed stale `@ts-check` and TypeScript references); the transformed source is left as-is for stability.
+- **CI** — `.github/workflows/ci.yml` was already aligned in the prior pass.
+
+Post-fix verification: lint 0 errors (18 warnings), build pass, bundle 441.3 KB JS / 54.5 KB CSS (within budgets), 50 unit tests pass, 20 e2e tests pass, `npm audit` 0 vulnerabilities, CSP 0 violations.
