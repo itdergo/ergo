@@ -62,7 +62,7 @@ export function ProjectsSection() {
                     />
                     <img
                       src={asset("projects/" + p.image)}
-                      alt={p.name}
+                      alt=""
                       loading="lazy"
                       decoding="async"
                     />

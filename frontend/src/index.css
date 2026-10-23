@@ -38,6 +38,12 @@
   --luxury-gold: #b8955a;
   --luxury-gold-light: #f0e6d6;
   --luxury-gold-muted: #d4b896;
+  /* Text-safe variant of the gold used for small label/eyebrow text over light
+     backgrounds. #b8955a only achieves ~2.8:1 contrast on white — fails WCAG
+     1.4.3 for 11px uppercase text. This darker gold clears 5.5:1 while keeping
+     the warm brand tone. Decorative elements (::before lines, gradients) keep
+     the lighter --luxury-gold. */
+  --label-gold: #7a5c2e;
   --luxury-charcoal: #1a1a1a;
   --luxury-cream: #f5f3ee;
   --surface: #fafcf8;
@@ -748,7 +754,7 @@ h4 {
   line-height: 1.55;
 }
 .section-label {
-  color: var(--luxury-gold);
+  color: var(--label-gold);
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
@@ -1386,7 +1392,7 @@ h4 {
   color: #fff;
   transform: translateY(-2px);
 }
-.footer-column h4 {
+.footer-column .footer-column-title {
   color: white;
   font: 600 12px var(--font-body);
   text-transform: uppercase;
@@ -3098,7 +3104,6 @@ h4 {
   color: #fff;
   font-size: 12px;
   font-weight: 600;
-  opacity: 0.3;
   transition:
     opacity 0.2s ease,
     background-color 0.2s ease;

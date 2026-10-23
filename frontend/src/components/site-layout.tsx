@@ -326,7 +326,7 @@ export function SiteLayout({
                 </div>
               </div>
               <div className="footer-column">
-                <h4>Company</h4>
+                <p className="footer-column-title">Company</p>
                 <ul>
                   <li>
                     <Link href="/">Home</Link>
@@ -349,7 +349,7 @@ export function SiteLayout({
                 </ul>
               </div>
               <div className="footer-column">
-                <h4>Products</h4>
+                <p className="footer-column-title">Products</p>
                 <ul>
                   {categories.slice(0, 4).map((c) => (
                     <li key={c.id}>
@@ -361,7 +361,7 @@ export function SiteLayout({
                 </ul>
               </div>
               <div className="footer-column">
-                <h4>Get in Touch</h4>
+                <p className="footer-column-title">Get in Touch</p>
                 <ul className="footer-contact-list">
                   <li>
                     <a href="tel:+63288431177">+63 2 8843 1177</a>
