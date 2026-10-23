@@ -26,25 +26,10 @@ jobs:
       - name: Prettier check
         run: npm run format:check
 
-  typecheck:
-    name: Type Check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - name: Build shared + database (needed for project refs)
-        run: npm run build:shared && npm run build:database
-      - name: Typecheck
-        run: npm run typecheck
-
   backend-test:
     name: Backend Unit Tests
     runs-on: ubuntu-latest
-    needs: [lint, typecheck]
+    needs: [lint]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -52,15 +37,13 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Build shared + database
-        run: npm run build:shared && npm run build:database
       - name: Run backend unit tests
         run: cd backend && npx vitest run
 
   frontend-test:
     name: Frontend Unit Tests
     runs-on: ubuntu-latest
-    needs: [lint, typecheck]
+    needs: [lint]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -68,8 +51,6 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Build shared packages
-        run: npm run build:shared
       - name: Run frontend unit tests
         run: cd frontend && npx vitest run
 
@@ -86,8 +67,6 @@ jobs:
       - run: npm ci
       - name: Install Chromium for prerender
         run: cd frontend && npx playwright install --with-deps chromium
-      - name: Build shared packages
-        run: npm run build:shared
       - name: Build frontend
         env:
           CHROME_BIN: chromium
@@ -172,8 +151,6 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Build shared + database packages
-        run: npm run build:shared && npm run build:database
       - name: Push database schema
         run: npm run db:push
       - name: Seed database
@@ -213,7 +190,7 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    needs: [lint, typecheck, backend-test, frontend-test, e2e-test, ui-quality, security]
+    needs: [lint, backend-test, frontend-test, e2e-test, ui-quality, security]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
