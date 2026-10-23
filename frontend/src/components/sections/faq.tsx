@@ -229,6 +229,7 @@ function FaqItem({
         id={answerId}
         role="region"
         aria-label={q}
+        aria-live="polite"
         /* A collapsed answer is animated to height 0 and opacity 0, but it
            stays in the accessibility tree. Hide it from assistive tech until
            it is actually open. */

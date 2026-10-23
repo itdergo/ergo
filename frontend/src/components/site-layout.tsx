@@ -388,9 +388,15 @@ export function SiteLayout({
         </footer>
       </div>
 
-      <button onClick={onAdminLogin} className="admin-launcher">
-        Admin
-      </button>
+      {/* Admin launcher: dev-only convenience link. Hidden in production so it
+          never appears on the live site; production login goes through the real
+          /admin route. `import.meta.env.PROD` is true only for the Vite prod
+          build. */}
+      {import.meta.env.DEV && (
+        <button onClick={onAdminLogin} className="admin-launcher">
+          Admin
+        </button>
+      )}
       <button
         className={`back-to-top ${showBackToTop ? "visible" : ""}`}
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}

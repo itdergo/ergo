@@ -157,6 +157,7 @@ function HeroImage() {
             alt="Contemporary office furnished by ERGO"
             loading="eager"
             fetchPriority="high"
+            decoding="async"
           />
         </picture>
       </motion.div>

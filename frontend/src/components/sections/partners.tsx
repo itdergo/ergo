@@ -67,7 +67,7 @@ function LogoRow({ logos, reverse = false }: { logos: typeof partners; reverse?:
               <img
                 src={`/images/partners/${p.logo}`}
                 alt={`${p.name} logo`}
-                loading="lazy"
+                loading="eager"
                 decoding="async"
               />
             </picture>

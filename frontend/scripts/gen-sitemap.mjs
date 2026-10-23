@@ -24,16 +24,28 @@ const siteUrl = routeConfig.siteUrl.replace(/\/$/, "");
 const today = new Date().toISOString().slice(0, 10);
 
 // Fetch active products from the API to include in the sitemap
+// Fallback: a static mirror of the seeded product slugs. When the API is
+// unavailable during CI/build the sitemap still advertises every product page
+// so Google does not lose them. Keep in sync with scripts/src/seed.ts.
+const FALLBACK_PRODUCT_SLUGS = [
+  "executive-chair",
+  "conference-table-12ft",
+  "es-32-workstation",
+  "mobile-pedestal",
+  "arena-seating-a200",
+  "kitchen-system-k100",
+];
 let products = [];
 try {
   const res = await fetch(`${API}/products?status=active&limit=100`, {
     signal: AbortSignal.timeout(5000), // 5 second timeout to avoid hanging builds
   });
   if (res.ok) products = (await res.json()).data ?? [];
-  else console.warn(`[sitemap] API returned ${res.status}; product URLs omitted`);
+  else console.warn(`[sitemap] API returned ${res.status}; using fallback product slugs`);
 } catch (err) {
-  console.warn(`[sitemap] API unreachable (${err.message}); product URLs omitted`);
+  console.warn(`[sitemap] API unreachable (${err.message}); using fallback product slugs`);
 }
+const slugs = new Set([...products.map((p) => p.slug), ...FALLBACK_PRODUCT_SLUGS]);
 
 // Build URL entries from the static route config
 const urls = routeConfig.routes.map((r) => ({
@@ -44,9 +56,9 @@ const urls = routeConfig.routes.map((r) => ({
 }));
 
 // Append dynamic product page URLs
-for (const p of products) {
+for (const slug of slugs) {
   urls.push({
-    loc: `${siteUrl}/products/${p.slug}`,
+    loc: `${siteUrl}/products/${slug}`,
     lastmod: today,
     changefreq: "monthly",
     priority: "0.6",
@@ -74,5 +86,5 @@ const xml =
 fs.mkdirSync(outDir, { recursive: true });
 fs.writeFileSync(path.join(outDir, "sitemap.xml"), xml);
 console.log(
-  `[sitemap] wrote ${urls.length} URLs (${routeConfig.routes.length} routes + ${products.length} products)`,
+  `[sitemap] wrote ${urls.length} URLs (${routeConfig.routes.length} routes + ${slugs.size} products)`,
 );

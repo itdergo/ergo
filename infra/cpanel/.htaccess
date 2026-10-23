@@ -83,4 +83,12 @@
   Header always set X-Content-Type-Options "nosniff"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
   Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+  Header always set Cross-Origin-Opener-Policy "same-origin"
+
+  # HSTS — only meaningful over HTTPS (section 1 forces the redirect), so guard
+  # it on the TLS-terminated request. max-age 1 year + preload is safe here.
+  <If "%{HTTP:X-Forwarded-Proto} == 'https' || %{HTTPS} == 'on'">
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+  </If>
 </IfModule>
