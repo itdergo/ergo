@@ -197,3 +197,10 @@ The following findings were resolved in the continuation pass:
 - **CI** — `.github/workflows/ci.yml` was already aligned in the prior pass.
 
 Post-fix verification: lint 0 errors (18 warnings), build pass, bundle 441.3 KB JS / 54.5 KB CSS (within budgets), 50 unit tests pass, 20 e2e tests pass, `npm audit` 0 vulnerabilities, CSP 0 violations.
+
+## 10. Second continuation pass
+
+- **L8 (API test coverage)** — ADDRESSED. Added route/middleware integration tests: `csrf.test.js` (9 tests — token format, safe-method skip, missing/unknown/expired/mismatched tokens, removal), `auth.test.js` (9 tests — `requireAuth`/`requireRole` matrix), and `routes/__tests__/inquiries.test.js` (6 tests — CSRF gate, validation 400, 201 happy path, no-persist-on-failure, public product read + cache header, 404). Backend unit tests went 40 → 64. Uses `supertest` + a mocked `db` (real drizzle-zod schemas preserved via `importOriginal`).
+- **Security hygiene** — Added `frontend/public/.well-known/security.txt` (RFC 9116 contact file, served at `/.well-known/security.txt`) and `SECURITY.md` (vulnerability-reporting policy, scope, safe harbor).
+
+Verification: lint 0 errors, build pass, 64 backend + 10 frontend unit tests pass, 20 e2e pass, security.txt returns 200.

@@ -1,0 +1,10 @@
+# ERGO Contracts Philippines — security contact
+# RFC 9116 security.txt. See https://securitytxt.org/
+
+Contact: mailto:sales_ergo@ergo.com.ph
+Contact: https://ergo.com.ph/contact
+Acknowledgments: https://ergo.com.ph/
+Policy: https://ergo.com.ph/security
+Preferred-Languages: en, fil
+Canonical: https://ergo.com.ph/.well-known/security.txt
+Expires: 2027-10-23T00:00:00.000Z

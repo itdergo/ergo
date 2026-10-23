@@ -6,6 +6,7 @@ var stdin_default = defineConfig({
     include: ["src/**/*.test.js"],
     env: {
       JWT_SECRET: "test-secret-key-for-vitest-unit-tests",
+      DATABASE_URL: "postgresql://ergo:ergo@localhost:5432/ergo_contracts",
       REDIS_URL: "redis://localhost:6379"
     }
   }
