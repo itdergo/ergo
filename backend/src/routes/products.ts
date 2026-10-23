@@ -27,7 +27,7 @@
  */
 
 import { Router, type Request, type Response } from "express";
-import { eq, desc, like, and, sql, isNull } from "drizzle-orm";
+import { eq, desc, ilike, and, sql, isNull } from "drizzle-orm";
 import { db } from "@ergo/database";
 import { products, categories, insertProductSchema } from "@ergo/database";
 import { requireAuth, requireRole } from "../middlewares/auth";
@@ -52,7 +52,7 @@ router.get("/", cachePublic(60), async (req: Request, res: Response) => {
       conditions.push(eq(categories.slug, category as string));
     }
     if (search) {
-      conditions.push(like(products.name, `%${search}%`));
+      conditions.push(ilike(products.name, `%${search}%`));
     }
     if (status) {
       conditions.push(eq(products.status, status as "active" | "draft" | "archived"));

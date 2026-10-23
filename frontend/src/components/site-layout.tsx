@@ -188,7 +188,7 @@ export function SiteLayout({
             </div>
 
             <Link className="nav-cta" href="/contact">
-              Request a Consultation
+              Get a Free Consultation
             </Link>
 
             <button
@@ -254,7 +254,7 @@ export function SiteLayout({
                 </Link>
               ))}
               <Link className="mobile-cta" href="/contact" onClick={() => setMobileOpen(false)}>
-                Request a Consultation
+                Get a Free Consultation
               </Link>
             </div>
           )}

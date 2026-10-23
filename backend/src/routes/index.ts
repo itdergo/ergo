@@ -31,6 +31,7 @@ import industriesRouter from "./industries";
 import solutionsRouter from "./solutions";
 import authRouter from "./auth";
 import uploadsRouter from "./uploads";
+import aiRouter from "./ai";
 
 const router: IRouter = Router();
 
@@ -43,5 +44,6 @@ router.use("/industries", industriesRouter);
 router.use("/solutions", solutionsRouter);
 router.use("/auth", authRouter);
 router.use("/uploads", uploadsRouter);
+router.use("/ai", aiRouter);
 
 export default router;

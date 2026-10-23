@@ -1,12 +1,13 @@
 /**
- * components/sections/solutions.tsx — Workplace solutions grid section.
+ * components/sections/solutions.tsx — Workplace solutions bento grid.
  *
- * Displays solution cards in a 2-column grid with:
- * - Numbered cards (01, 02, 03, 04) with large background numbers
- * - Solution images from image-maps.ts (mapped by solution title)
- * - Icon, title, description for each solution
- * - "Learn More" link to contact section
- * - Scroll-triggered entrance animations with stagger
+ * Higgsfield "gapless bento": six columns, cards spanning either a full row or
+ * half a row on an alternating rhythm, so the grid reads as a composition
+ * rather than a uniform stack. Each card carries a full-bleed photo (or a brand
+ * gradient when no photo is mapped), a scrim for legibility, and a 3D hover lift.
+ *
+ * Motion: scroll-triggered entrance with a per-card stagger, and a rotateX so
+ * the cards tip into view rather than merely sliding up.
  *
  * Data: solutions array from useSite() context (loaded from API)
  * Images: solutionImages mapping from lib/image-maps.ts
@@ -33,46 +34,54 @@ export function SolutionsSection() {
               installed, functional space.
             </p>
           </div>
-          <div className="solution-grid">
-            {solutions.map((s, i) => (
-              // Motion card: scroll-triggered fade-in with stagger delay
-              <motion.div
-                className="solution-card"
-                key={s.id}
-                initial={{ opacity: 1, y: 0 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-40px" }}
-                transition={{ duration: 0.5, delay: i * 0.12 }}
-              >
-                <div className="solution-number">{String(i + 1).padStart(2, "0")}</div>
-                {/* Background number: decorative large number with low opacity */}
-                {solutionImages[s.title] && (
-                  <div className="solution-image">
-                    <picture>
-                      <source
-                        srcSet={srcSet(solutionImages[s.title])}
-                        type="image/webp"
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                      />
-                      <img
-                        src={asset(solutionImages[s.title])}
-                        alt={s.title}
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    </picture>
+          <div className="bento">
+            {solutions.map((s, i) => {
+              const image = solutionImages[s.title];
+              // Alternating rhythm: every third card takes the full row, the rest
+              // pair up two-to-a-row. Derived from the index so it holds at any
+              // number of solutions.
+              const span = i % 3 === 0 ? "bento-card--wide" : "bento-card--half";
+              return (
+                <motion.article
+                  className={`bento-card ${span}`}
+                  key={s.id}
+                  initial={{ opacity: 0, y: 44, rotateX: -14 }}
+                  whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{
+                    duration: 0.68,
+                    delay: (i % 3) * 0.09,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                >
+                  {/* Full-bleed media. The `--empty` variant paints a brand
+                      gradient so a solution with no mapped photo still reads as
+                      a designed card instead of white type on white. */}
+                  <div className={`bento-card__media${image ? "" : " bento-card__media--empty"}`}>
+                    {image && (
+                      <picture>
+                        <source
+                          srcSet={srcSet(image)}
+                          type="image/webp"
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                        />
+                        <img src={asset(image)} alt={s.title} loading="lazy" decoding="async" />
+                      </picture>
+                    )}
                   </div>
-                )}
-                <div className="solution-content">
-                  <div className="icon-tile">{getIcon(s.icon, 21)}</div>
-                  <h3>{s.title}</h3>
-                  <p>{s.description}</p>
-                  <a href="#contact" className="solution-link">
-                    Learn More <ArrowRight size={13} />
-                  </a>
-                </div>
-              </motion.div>
-            ))}
+                  <div className="bento-card__scrim" />
+                  <div className="bento-card__body">
+                    <span className="bento-card__num">{String(i + 1).padStart(2, "0")}</span>
+                    <div className="bento-card__icon">{getIcon(s.icon, 20)}</div>
+                    <h3 className="bento-card__title">{s.title}</h3>
+                    <p className="bento-card__desc">{s.description}</p>
+                    <a href="#contact" className="bento-card__link">
+                      Learn More <ArrowRight size={13} />
+                    </a>
+                  </div>
+                </motion.article>
+              );
+            })}
           </div>
         </div>
       </section>

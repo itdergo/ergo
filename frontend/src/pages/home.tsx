@@ -24,6 +24,7 @@ import { PartnersSection } from "@/components/sections/partners";
 import { FaqSection } from "@/components/sections/faq";
 import { CtaBanner } from "@/components/sections/cta-banner";
 import { ContactSection } from "@/components/sections/contact";
+import { MarqueeBand, ScrollRail } from "@/components/fx";
 
 export function HomePage() {
   const meta = metaForPath("/")!;
@@ -36,7 +37,11 @@ export function HomePage() {
 
   return (
     <>
+      {/* Section progress rail: desktop-only, self-gated on reduced motion. */}
+      <ScrollRail />
       <HeroSection />
+      {/* Oversized outlined kinetic-type band between chapters. */}
+      <MarqueeBand />
       <AboutSection />
       <ProductsSection />
       <SolutionsSection />

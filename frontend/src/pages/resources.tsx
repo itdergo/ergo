@@ -26,8 +26,8 @@ export function ResourcesPage() {
   return (
     <>
       <PageHero
-        label="Resources &amp; Catalog"
-        title="Brochures &amp; specifications."
+        label="Resources & Catalog"
+        title="Brochures & specifications."
         intro="Download our catalogues and product specifications for seating, desking, systems furniture and storage."
         crumb="Resources"
       />

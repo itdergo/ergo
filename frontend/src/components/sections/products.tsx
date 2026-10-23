@@ -25,6 +25,7 @@ import { srcSet } from "@/lib/types";
 import { TiltCard, ScrollReveal } from "@/lib/site-ui-primitives";
 import { Archive, ArrowRight, ArrowUpRight, Heart, Search, Maximize2 } from "lucide-react";
 import { Lightbox } from "@/components/ui/lightbox";
+import { KineticHeading } from "@/components/fx";
 
 export function ProductsSection() {
   const {
@@ -57,7 +58,11 @@ export function ProductsSection() {
         <div className="container">
           <div className="section-head">
             <span className="section-label">Our Products</span>
-            <h2 className="section-heading">A complete furniture ecosystem.</h2>
+            <KineticHeading
+              as="h2"
+              className="section-heading"
+              text="A complete furniture ecosystem."
+            />
             <p className="section-intro">
               From a single ergonomic chair to a fully fitted workplace.
             </p>

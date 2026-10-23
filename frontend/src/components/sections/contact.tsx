@@ -15,9 +15,9 @@
  * - Resets form on successful submission
  */
 import { useSite } from "@/lib/site-context";
-import { asset, srcSet } from "@/lib/types";
 import { ScrollReveal } from "@/lib/site-ui-primitives";
 import { ArrowUpRight, Clock, Globe, Mail, MapPin, Phone, Send, ShieldCheck } from "lucide-react";
+import { KineticHeading } from "@/components/fx";
 
 export function ContactSection() {
   const { handleSubmit, formStatus } = useSite();
@@ -27,7 +27,7 @@ export function ContactSection() {
         <div className="container contact-grid">
           <div>
             <span className="section-label">Contact</span>
-            <h2 className="section-heading">Request a Consultation</h2>
+            <KineticHeading as="h2" className="section-heading" text="Get a Free Consultation" />
             <p className="section-intro">Tell us about your space and requirements.</p>
             <div className="contact-details">
               <div className="contact-detail">
@@ -185,29 +185,6 @@ export function ContactSection() {
               Visit a showroom near you, or reach any of our representative offices and retail
               partners across the Philippines and overseas.
             </p>
-            <figure className="branch-network-figure">
-              <picture>
-                <source
-                  srcSet={srcSet("branch-network.jpg")}
-                  type="image/webp"
-                  sizes="(max-width: 768px) 100vw, 1200px"
-                />
-                <img
-                  className="branch-network-img"
-                  src={asset("branch-network.jpg")}
-                  alt="ERGO Philippine and global presence: global offices in the USA, China, Vietnam, Malaysia, Singapore and Nigeria; Philippine retail locations at SM Megamall, Cebu and Davao"
-                  width={1600}
-                  height={900}
-                  loading="lazy"
-                  decoding="async"
-                />
-              </picture>
-              <figcaption>
-                ERGO Philippine and global presence — representative offices in the USA, China,
-                Vietnam, Malaysia, Singapore and Nigeria, with retail locations at SM Megamall, Cebu
-                and Davao.
-              </figcaption>
-            </figure>
           </div>
           <div className="contact-map">
             {/* Google Maps embed: lazy-loaded iframe showing office location */}

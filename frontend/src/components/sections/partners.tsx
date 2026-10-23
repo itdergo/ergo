@@ -13,6 +13,7 @@
 import { ScrollReveal } from "@/lib/site-ui-primitives";
 import { webpLogo } from "@/lib/types";
 import { motion } from "framer-motion";
+import { KineticHeading } from "@/components/fx";
 
 const partners = [
   { name: "BDO", logo: "BDO.png" },
@@ -88,7 +89,11 @@ export function PartnersSection() {
         <div className="container">
           <div className="section-head">
             <span className="section-label">Partners</span>
-            <h2 className="section-heading section-heading--md">Our partners and clients.</h2>
+            <KineticHeading
+              as="h2"
+              className="section-heading section-heading--md"
+              text="Our partners and clients."
+            />
             <p className="section-intro">
               From banks and universities to government agencies and global brands — the
               Philippines&rsquo; most trusted institutions choose ERGO.

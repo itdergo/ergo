@@ -171,6 +171,19 @@ router.get("/:filename", async (req: Request, res: Response) => {
     }
 
     const data = await fs.readFile(filePath);
+    // Set Content-Type based on file extension
+    const ext = path.extname(filename).toLowerCase();
+    const mimeTypes: Record<string, string> = {
+      ".jpg": "image/jpeg",
+      ".jpeg": "image/jpeg",
+      ".png": "image/png",
+      ".webp": "image/webp",
+      ".gif": "image/gif",
+      ".svg": "image/svg+xml",
+      ".pdf": "application/pdf",
+    };
+    const contentType = mimeTypes[ext] || "application/octet-stream";
+    res.setHeader("Content-Type", contentType);
     res.send(data);
   } catch {
     res.status(404).json({ error: "File not found" });

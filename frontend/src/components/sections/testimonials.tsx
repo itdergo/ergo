@@ -14,6 +14,8 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ScrollReveal } from "@/lib/site-ui-primitives";
 import { Star, Quote, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
+import { KineticHeading } from "@/components/fx";
+import { useReducedMotion } from "@/lib/site-ui-primitives";
 
 const testimonials = [
   // Static testimonial data: name, role, text, rating
@@ -56,6 +58,7 @@ const testimonials = [
 ];
 
 export function TestimonialsSection() {
+  const reduced = useReducedMotion();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   const visibleCount = 3;
@@ -79,9 +82,11 @@ export function TestimonialsSection() {
         <div className="container">
           <div className="section-head">
             <span className="section-label">Testimonials</span>
-            <h2 className="section-heading section-heading--md">
-              Trusted by leading organizations.
-            </h2>
+            <KineticHeading
+              as="h2"
+              className="section-heading section-heading--md"
+              text="Trusted by leading organizations."
+            />
             <p className="section-intro">Hear from the teams who work with ERGO every day.</p>
           </div>
           <div className="testimonial-dots">
@@ -115,6 +120,9 @@ export function TestimonialsSection() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: direction > 0 ? -50 : 50 }}
                     transition={{ duration: 0.4, delay: i * 0.08 }}
+                    whileHover={
+                      reduced ? undefined : { y: -8, rotateX: 3, scale: 1.015, zIndex: 3 }
+                    }
                     onClick={() => {
                       setDirection(1);
                       setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));

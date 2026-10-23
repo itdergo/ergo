@@ -7,7 +7,7 @@ test.describe("Contact Form", () => {
     // Page hero should be visible
     const pageHero = page.locator(".page-hero");
     await expect(pageHero).toBeVisible();
-    await expect(pageHero.locator("h1")).toContainText("Request a Consultation");
+    await expect(pageHero.locator("h1")).toContainText("Get a Free Consultation");
 
     // Contact form should be present
     const form = page.locator("form.contact-form");

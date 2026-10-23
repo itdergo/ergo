@@ -18,6 +18,7 @@ import { getIcon } from "@/lib/image-maps";
 import { industryImages } from "@/lib/image-maps";
 import { ArrowRight } from "lucide-react";
 import { useSite } from "@/lib/site-context";
+import { KineticHeading } from "@/components/fx";
 
 /**
  * Industries section. The industries are seeded and their images ship in
@@ -39,7 +40,11 @@ export function IndustriesSection() {
         <div className="container">
           <div className="section-head">
             <span className="section-label">Industries</span>
-            <h2 className="section-heading section-heading--md">Built for the spaces you run.</h2>
+            <KineticHeading
+              as="h2"
+              className="section-heading section-heading--md"
+              text="Built for the spaces you run."
+            />
             <p className="section-intro">
               ERGO furnishes the environments where people learn, work, gather and recover — across
               the Philippines and Southeast Asia.

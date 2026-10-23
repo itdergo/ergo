@@ -28,6 +28,7 @@ import {
   MessageSquare,
   Package,
   Settings,
+  Bot,
 } from "lucide-react";
 import { DashboardView } from "@/components/admin/admin-dashboard";
 import { ProductsView } from "@/components/admin/admin-products";
@@ -36,6 +37,7 @@ import { CategoriesView } from "@/components/admin/admin-categories";
 import { ResourcesView } from "@/components/admin/admin-resources";
 import { IndustriesView } from "@/components/admin/admin-industries";
 import { SolutionsView } from "@/components/admin/admin-solutions";
+import { WorkforceView } from "@/components/admin/admin-workforce";
 
 // Admin panel + login screen, extracted verbatim from App.tsx.
 
@@ -147,6 +149,7 @@ export function AdminPanel({
     { id: "resources", label: "Resources", icon: FileText },
     { id: "industries", label: "Industries", icon: Building2 },
     { id: "solutions", label: "Solutions", icon: Settings },
+    { id: "workforce", label: "AI Workforce", icon: Bot },
   ];
   return (
     <div className="min-h-screen bg-gray-100 flex">
@@ -196,6 +199,7 @@ export function AdminPanel({
         {activeTab === "resources" && <ResourcesView />}
         {activeTab === "industries" && <IndustriesView />}
         {activeTab === "solutions" && <SolutionsView />}
+        {activeTab === "workforce" && <WorkforceView />}
       </main>
     </div>
   );

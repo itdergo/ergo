@@ -249,6 +249,25 @@ export const auditLogs = pgTable("audit_logs", {
 });
 
 // ────────────────────────────────────────────────────────────────────────────
+// AI Workforce Tasks Table
+// ────────────────────────────────────────────────────────────────────────────
+
+/** Task assigned to (and executed by) one of the 5 AI employees. The router
+ *  picks the employee from the task title+description; `status` tracks the
+ *  lifecycle (queued → running → done | failed). */
+export const aiTasks = pgTable("ai_tasks", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  employeeId: varchar("employee_id", { length: 64 }).notNull(),
+  status: varchar("status", { length: 32 }).default("queued").notNull(),
+  result: text("result"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  completedAt: timestamp("completed_at"),
+});
+
+// ────────────────────────────────────────────────────────────────────────────
 // Table Relations (for Drizzle's relational query API)
 // ────────────────────────────────────────────────────────────────────────────
 
@@ -330,6 +349,16 @@ export const insertSolutionSchema = createInsertSchema(solutions).omit({
   deletedAt: true,
 });
 
+export const insertAiTaskSchema = createInsertSchema(aiTasks).omit({
+  id: true,
+  employeeId: true, // chosen by the router, not the client
+  status: true,
+  result: true,
+  createdAt: true,
+  updatedAt: true,
+  completedAt: true,
+});
+
 // ────────────────────────────────────────────────────────────────────────────
 // Inferred Types
 //
@@ -352,3 +381,5 @@ export type NewIndustry = z.infer<typeof insertIndustrySchema>;
 export type Solution = typeof solutions.$inferSelect;
 export type NewSolution = z.infer<typeof insertSolutionSchema>;
 export type AuditLog = typeof auditLogs.$inferSelect;
+export type AiTask = typeof aiTasks.$inferSelect;
+export type NewAiTask = z.infer<typeof insertAiTaskSchema>;

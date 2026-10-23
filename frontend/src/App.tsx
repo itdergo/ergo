@@ -27,6 +27,7 @@ import { Router, Route, Switch } from "wouter";
 import { api } from "@/lib/api";
 import { SiteProvider } from "@/lib/site-context";
 import { SiteLayout } from "@/components/site-layout";
+import { CustomCursor, Grain } from "@/components/fx";
 import { LoginPage, AdminPanel } from "@/components/admin/admin-panel";
 import { HomePage } from "@/pages/home";
 const ProductsPage = lazy(() =>
@@ -113,6 +114,11 @@ function App() {
     // Public site view: wrapped in Router + SiteProvider + SiteLayout
     <Router>
       <SiteProvider>
+        {/* FX layer: pointer-driven chrome for the public site. Both components
+            self-gate on prefers-reduced-motion and a fine pointer, and the admin
+            / login views are deliberately left out of it. */}
+        <Grain />
+        <CustomCursor />
         <SiteLayout onAdminLogin={() => setCurrentView("login")}>
           <Suspense fallback={null}>
             <Switch>

@@ -28,7 +28,7 @@ export function NotFoundPage() {
           That page doesn’t exist or has moved. Try the product range or get in touch.
         </p>
         <div className="hero-actions">
-          <Link className="primary" href="/products">
+          <Link className="button-primary" href="/products">
             Browse products <ArrowRight size={15} />
           </Link>
           <Link className="button-secondary" href="/contact">

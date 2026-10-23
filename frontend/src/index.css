@@ -478,6 +478,32 @@ h4 {
 .hero-image-wrap {
   position: relative;
   min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.hero-image-glow {
+  position: absolute;
+  inset: -20%;
+  background: radial-gradient(ellipse at center, rgba(80, 160, 20, 0.12) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  animation: hero-glow-pulse 4s ease-in-out infinite;
+}
+@keyframes hero-glow-pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+.hero-image-depth {
+  position: relative;
+  z-index: 1;
 }
 .hero-image {
   width: 100%;
@@ -521,7 +547,12 @@ h4 {
 }
 
 .section-muted {
-  background: hsl(96 20% 96% / 0.3);
+  background: linear-gradient(
+    180deg,
+    hsl(96 20% 96% / 0.3) 0%,
+    hsl(96 20% 96% / 0.6) 50%,
+    hsl(96 20% 96% / 0.3) 100%
+  );
 }
 .about-grid,
 .contact-grid {
@@ -835,8 +866,9 @@ h4 {
   cursor: default;
 }
 .product-card:hover {
-  border-color: rgba(201, 169, 110, 0.4);
-  box-shadow: 0 12px 32px rgba(28, 35, 24, 0.1);
+  transform: translateY(-4px);
+  border-color: rgba(80, 160, 20, 0.3);
+  box-shadow: 0 16px 40px rgba(28, 35, 24, 0.12);
 }
 .product-badge {
   position: absolute;
@@ -3113,5 +3145,648 @@ h4 {
   }
   .about-facts {
     padding: 22px;
+  }
+}
+
+/* ==========================================================================
+   FX LAYER — Higgsfield-style motion, 3D depth and pointer effects.
+   --------------------------------------------------------------------------
+   Additive, and gated:
+   - pointer-driven FX (cursor, spotlight) only mounts on fine pointers with
+     motion allowed — see components/fx/hooks.ts — so touch users pay nothing
+     for an effect they cannot see;
+   - the global `@media (prefers-reduced-motion: reduce)` block above already
+     collapses animation/transition durations to ~0 for everything declared
+     here, and each component also renders a static fallback.
+   Z-index budget: rail 900 · grain 9998 (under the 9999 lightbox) ·
+   cursor 10001 (over the lightbox) · preloader 12000.
+   ========================================================================== */
+
+:root {
+  /* The single "electric accent" the FX layer is allowed to spend. Everything
+     else in the system stays in the brand green / gold family. */
+  --fx-acid: #c9f24b;
+  --fx-ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+  --fx-perspective: 1400px;
+}
+
+/* ---------- Custom cursor ---------- */
+/* Only added to <html> once CustomCursor has mounted, so a JS failure or a
+   coarse-pointer device leaves the native cursor completely untouched. */
+.fx-cursor,
+.fx-cursor * {
+  cursor: none !important;
+}
+.fx-cursor-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  pointer-events: none;
+}
+.fx-cursor-dot,
+.fx-cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: block;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  will-change: transform;
+}
+.fx-cursor-ready .fx-cursor-dot,
+.fx-cursor-ready .fx-cursor-ring {
+  opacity: 1;
+}
+.fx-cursor-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--fx-acid);
+}
+.fx-cursor-ring {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(201, 242, 75, 0.75);
+  transition:
+    opacity 0.3s ease,
+    width 0.28s var(--fx-ease-out-expo),
+    height 0.28s var(--fx-ease-out-expo),
+    border-color 0.28s ease,
+    background-color 0.28s ease;
+}
+.fx-cursor-ring[data-variant="link"] {
+  width: 60px;
+  height: 60px;
+  border-color: var(--fx-acid);
+  background: rgba(201, 242, 75, 0.08);
+}
+.fx-cursor-ring[data-variant="view"] {
+  width: 84px;
+  height: 84px;
+  border-color: var(--fx-acid);
+  background: rgba(201, 242, 75, 0.12);
+}
+/* Labelled state renders its label inside the ring, so "View" reads as a
+   stamp rather than as a hover artifact. */
+.fx-cursor-ring[data-label]:not([data-label=""])::after {
+  content: attr(data-label);
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.fx-cursor-press .fx-cursor-ring {
+  width: 28px;
+  height: 28px;
+}
+@media (hover: none), (pointer: coarse) {
+  .fx-cursor-layer {
+    display: none;
+  }
+}
+
+/* ---------- Film grain ---------- */
+.fx-grain {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+/* ---------- Preloader ---------- */
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  display: grid;
+  place-items: center;
+  background: #0b0f0a;
+  pointer-events: none;
+  transition:
+    opacity 0.42s ease,
+    visibility 0.42s ease;
+}
+.preloader-leaving {
+  opacity: 0;
+  visibility: hidden;
+}
+.preloader-inner {
+  text-align: center;
+  color: #fff;
+}
+.preloader-mark {
+  font: 800 42px/1 var(--font-heading);
+  letter-spacing: 0.18em;
+  color: var(--fx-acid);
+}
+.preloader-sub {
+  margin-top: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.44em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+.preloader-track {
+  width: 200px;
+  height: 2px;
+  margin: 28px auto 12px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.14);
+}
+.preloader-track span {
+  display: block;
+  height: 100%;
+  background: var(--fx-acid);
+  transform-origin: left center;
+  will-change: transform;
+}
+.preloader-count {
+  font: 600 12px/1 var(--font-body);
+  letter-spacing: 0.22em;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* ---------- Section progress rail ---------- */
+.scroll-rail {
+  position: fixed;
+  right: 22px;
+  top: 50%;
+  z-index: 900;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  transform: translateY(-50%);
+}
+.scroll-rail-dot {
+  position: relative;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(23, 27, 22, 0.26);
+  transition:
+    transform 0.3s var(--fx-ease-out-expo),
+    background-color 0.3s ease;
+}
+.scroll-rail-dot:hover {
+  background: var(--brand);
+}
+.scroll-rail-dot.active {
+  background: var(--brand);
+  transform: scale(1.7);
+}
+.scroll-rail-dot::after {
+  content: attr(data-label);
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: rgba(11, 15, 10, 0.92);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-50%) translateX(6px);
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s var(--fx-ease-out-expo);
+}
+.scroll-rail-dot:hover::after,
+.scroll-rail-dot:focus-visible::after {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+@media (max-width: 1023px) {
+  .scroll-rail {
+    display: none;
+  }
+}
+
+/* ---------- Marquee band ---------- */
+.marquee-band {
+  overflow: hidden;
+  padding: 30px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: var(--soft);
+}
+.marquee-band-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-band-scroll 38s linear infinite;
+}
+.marquee-band:hover .marquee-band-track {
+  animation-play-state: paused;
+}
+.marquee-band-line {
+  flex: 0 0 auto;
+  padding-right: 24px;
+  font: 800 46px/1 var(--font-heading);
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(23, 27, 22, 0.24);
+}
+@keyframes marquee-band-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee-band[data-reduced] .marquee-band-track {
+  animation: none;
+}
+.marquee-band[data-reduced] .marquee-band-line {
+  font-size: 24px;
+  -webkit-text-stroke: 1px rgba(23, 27, 22, 0.3);
+}
+@supports not (-webkit-text-stroke: 1px black) {
+  .marquee-band-line {
+    color: rgba(23, 27, 22, 0.2);
+  }
+}
+@media (max-width: 639px) {
+  .marquee-band {
+    padding: 20px 0;
+  }
+  .marquee-band-line {
+    font-size: 30px;
+  }
+}
+
+/* ---------- Kinetic heading ---------- */
+.kinetic {
+  perspective: 900px;
+}
+.kinetic-unit {
+  display: inline-block;
+  transform-origin: 50% 100%;
+  will-change: transform, opacity, filter;
+}
+
+/* ---------- 3D cascading card deck ---------- */
+.three-deck {
+  position: relative;
+  perspective: var(--fx-perspective);
+  perspective-origin: 50% 50%;
+  padding: 48px 0 96px;
+}
+.three-deck-stage {
+  display: grid;
+  place-items: center;
+  min-height: var(--three-deck-height, 440px);
+  transform-style: preserve-3d;
+}
+.three-deck-card {
+  grid-area: 1 / 1;
+  width: min(430px, 78vw);
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+}
+.three-deck-card > * {
+  border-radius: 20px;
+}
+/* Reduced motion: a plain snap-scrolling row instead of a rotating 3D stack. */
+.three-deck[data-reduced] {
+  padding: 0;
+}
+.three-deck[data-reduced] .three-deck-stage {
+  grid-auto-flow: column;
+  grid-template-columns: none;
+  gap: 20px;
+  min-height: 0;
+  padding: 0 0 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  transform-style: flat;
+}
+.three-deck[data-reduced] .three-deck-card {
+  width: 260px;
+  scroll-snap-align: center;
+}
+
+/* ---------- Hero: cursor spotlight ---------- */
+.hero-spotlight {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1100px;
+  height: 1100px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(
+    circle,
+    rgba(80, 160, 20, 0.13) 0%,
+    rgba(80, 160, 20, 0.05) 34%,
+    transparent 62%
+  );
+  will-change: transform;
+}
+
+/* ---------- Hero: 3D floating specimen chips ---------- */
+.hero-chips {
+  position: absolute;
+  inset: -10% -6%;
+  z-index: 2;
+  pointer-events: none;
+  transform-style: preserve-3d;
+}
+.hero-chip {
+  position: absolute;
+  padding: 10px 15px;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.74);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 18px 40px rgba(11, 15, 10, 0.16);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink);
+  white-space: nowrap;
+  animation: hero-chip-float 7s ease-in-out infinite;
+  will-change: transform;
+}
+.hero-chip b {
+  color: var(--brand);
+}
+.hero-chip-1 {
+  top: 4%;
+  right: 0;
+  transform: translateZ(110px);
+  animation-delay: -1.2s;
+}
+.hero-chip-2 {
+  bottom: 12%;
+  left: -4%;
+  transform: translateZ(170px);
+  animation-delay: -3.4s;
+}
+.hero-chip-3 {
+  top: 46%;
+  right: -8%;
+  transform: translateZ(60px);
+  animation-delay: -5.1s;
+}
+@keyframes hero-chip-float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -12px;
+  }
+}
+@media (max-width: 1023px) {
+  .hero-chips {
+    display: none;
+  }
+}
+
+/* ---------- Bento (solutions) ---------- */
+.bento {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 16px;
+  margin-top: 48px;
+}
+.bento-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 10px;
+  min-height: 250px;
+  padding: 26px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--surface);
+  transform-style: preserve-3d;
+  transition:
+    transform 0.5s var(--fx-ease-out-expo),
+    box-shadow 0.5s var(--fx-ease-out-expo),
+    border-color 0.4s ease;
+}
+.bento-card:hover {
+  transform: translateY(-8px) scale(1.012);
+  border-color: rgba(80, 160, 20, 0.35);
+  box-shadow: 0 30px 60px rgba(11, 15, 10, 0.14);
+}
+.bento-card--wide {
+  grid-column: span 6;
+  min-height: 300px;
+}
+.bento-card--half {
+  grid-column: span 3;
+}
+.bento-card__media,
+.bento-card__scrim {
+  position: absolute;
+  inset: 0;
+}
+.bento-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s var(--fx-ease-out-expo);
+}
+.bento-card:hover .bento-card__media img {
+  transform: scale(1.07);
+}
+.bento-card__scrim {
+  background: linear-gradient(
+    to top,
+    rgba(11, 15, 10, 0.88) 0%,
+    rgba(11, 15, 10, 0.3) 46%,
+    rgba(11, 15, 10, 0) 76%
+  );
+}
+.bento-card__body {
+  position: relative;
+  z-index: 2;
+  color: #fff;
+}
+.bento-card__media--empty {
+  background: linear-gradient(135deg, var(--brand-deep) 0%, #24490c 100%);
+}
+.bento-card__num {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--fx-acid);
+}
+.bento-card__icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.16);
+  color: var(--fx-acid);
+}
+.bento-card__title {
+  font: 700 25px/1.15 var(--font-heading);
+  letter-spacing: -0.02em;
+}
+.bento-card__desc {
+  max-width: 48ch;
+  font-size: 14px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.78);
+}
+.bento-card__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #fff;
+}
+.bento-card__link:hover {
+  color: var(--fx-acid);
+}
+@media (max-width: 1023px) {
+  .bento {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .bento-card--wide,
+  .bento-card--half {
+    grid-column: span 2;
+  }
+}
+@media (max-width: 639px) {
+  .bento {
+    grid-template-columns: 1fr;
+  }
+  .bento-card--wide,
+  .bento-card--half {
+    grid-column: span 1;
+    min-height: 220px;
+  }
+}
+
+/* ---------- Industry cards: deeper 3D hover ---------- */
+.industry-grid .industry-card {
+  transform-style: preserve-3d;
+  transition:
+    transform 0.5s var(--fx-ease-out-expo),
+    box-shadow 0.5s var(--fx-ease-out-expo);
+}
+.industry-grid .industry-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 26px 48px rgba(11, 15, 10, 0.16);
+}
+
+/* ---------- About: layered image frame ---------- */
+/* Perspective on the card, so the frame's translateZ planes actually recede. */
+.about-facts {
+  perspective: 1200px;
+}
+.about-figure {
+  position: relative;
+  transform-style: preserve-3d;
+}
+.about-figure::before,
+.about-figure::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  border: 1px solid rgba(201, 169, 110, 0.45);
+  pointer-events: none;
+}
+.about-figure::before {
+  transform: translate3d(14px, 14px, -40px);
+}
+.about-figure::after {
+  transform: translate3d(-14px, -14px, -70px);
+}
+.about-figure .about-image {
+  position: relative;
+  z-index: 1;
+  transition:
+    transform 0.6s var(--fx-ease-out-expo),
+    box-shadow 0.6s var(--fx-ease-out-expo);
+}
+.about-figure:hover .about-image {
+  transform: translateZ(26px);
+  box-shadow: 0 40px 80px rgba(11, 15, 10, 0.2);
+}
+
+/* ---------- CTA banner: depth layers ---------- */
+.cta-banner-inner {
+  position: relative;
+  overflow: hidden;
+  transform-style: preserve-3d;
+}
+.cta-banner-inner::before,
+.cta-banner-inner::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.cta-banner-inner::before {
+  width: 420px;
+  height: 420px;
+  right: -120px;
+  top: -170px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.28) 0%, transparent 70%);
+}
+.cta-banner-inner::after {
+  width: 320px;
+  height: 320px;
+  left: -100px;
+  bottom: -150px;
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.22) 0%, transparent 70%);
+}
+
+/* ---------- Testimonials: 3D lift ---------- */
+.testimonial-card:hover {
+  box-shadow: 0 26px 52px rgba(11, 15, 10, 0.16);
+}
+
+/* ---------- Contact: layered card ---------- */
+.contact-form {
+  transform-style: preserve-3d;
+}
+
+/* ---------- Reduced motion: kill the FX layer's continuous animation ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .hero-chip,
+  .marquee-band-track {
+    animation: none !important;
+  }
+  .fx-cursor-layer,
+  .hero-chips,
+  .hero-spotlight {
+    display: none !important;
+  }
+  .hero-chip {
+    opacity: 1;
   }
 }

@@ -22,8 +22,8 @@ export function ResourcesSection() {
       <section className="section section-muted" id="resources">
         <div className="container">
           <div className="section-head">
-            <span className="section-label">Resources &amp; Catalog</span>
-            <h2 className="section-heading">Brochures &amp; specifications.</h2>
+            <span className="section-label">Resources & Catalog</span>
+            <h2 className="section-heading">Brochures & specifications.</h2>
             <p className="section-intro">Download our catalogues and product specifications.</p>
           </div>
           <div className="resource-grid">

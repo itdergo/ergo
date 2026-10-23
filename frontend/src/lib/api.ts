@@ -172,6 +172,34 @@ class ApiClient {
     return this.request<Solution[]>("/solutions");
   }
 
+  // AI Workforce
+  getAiEmployees() {
+    return this.request<{ data: any[] }>("/ai/employees");
+  }
+
+  getAiTasks(limit?: number) {
+    const qs = limit ? `?limit=${limit}` : "";
+    return this.request<{ data: any[] }>(`/ai/tasks${qs}`);
+  }
+
+  createAiTask(data: { title: string; description?: string }) {
+    return this.request<{ data: any; routing: any }>("/ai/tasks", {
+      method: "POST",
+      body: data,
+    });
+  }
+
+  updateAiTask(id: string, data: { status?: string; result?: string }) {
+    return this.request<{ data: any }>(`/ai/tasks/${id}`, {
+      method: "PATCH",
+      body: data,
+    });
+  }
+
+  deleteAiTask(id: string) {
+    return this.request<{ data: any }>(`/ai/tasks/${id}`, { method: "DELETE" });
+  }
+
   // Auth
   getMe() {
     return this.request<{ user: User }>("/auth/me");

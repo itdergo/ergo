@@ -17,7 +17,7 @@ test.describe("Home Page", () => {
     await expect(hero.locator(".hero-copy")).toBeVisible();
 
     // CTA buttons should be present
-    await expect(hero.locator("text=Get a Free Quote")).toBeVisible();
+    await expect(hero.locator("text=Get a Free Consultation")).toBeVisible();
     await expect(hero.locator("text=Explore Products")).toBeVisible();
   });
 

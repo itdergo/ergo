@@ -127,6 +127,21 @@ jobs:
             echo "WARNING: sitemap.xml not found"
           fi
 
+      - name: Enforce bundle size budget
+        run: |
+          total_js=$(find frontend/dist/public/assets -name '*.js' -exec stat -c%s {} \; | awk '{s+=$1} END {printf "%.0f", s/1024}')
+          echo "Total JS: ${total_js} KB (budget 500 KB)"
+          if [ "${total_js}" -gt 500 ]; then
+            echo "ERROR: JS bundle exceeds 500 KB budget"
+            exit 1
+          fi
+          total_css=$(find frontend/dist/public/assets -name '*.css' -exec stat -c%s {} \; | awk '{s+=$1} END {printf "%.0f", s/1024}')
+          echo "Total CSS: ${total_css} KB (budget 120 KB)"
+          if [ "${total_css}" -gt 120 ]; then
+            echo "ERROR: CSS bundle exceeds 120 KB budget"
+            exit 1
+          fi
+
   e2e-test:
     name: E2E Tests
     runs-on: ubuntu-latest
@@ -175,10 +190,31 @@ jobs:
           path: frontend/playwright-report
           retention-days: 7
 
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: npm audit (production deps)
+        run: npm audit --omit=dev --audit-level=high
+      - name: Secret scan (gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Dependency review
+        if: github.event_name == 'pull_request'
+        uses: actions/dependency-review-action@v4
+
   build:
     name: Build
     runs-on: ubuntu-latest
-    needs: [lint, typecheck, backend-test, frontend-test, e2e-test, ui-quality]
+    needs: [lint, typecheck, backend-test, frontend-test, e2e-test, ui-quality, security]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

@@ -27,7 +27,7 @@ export function ContactPage() {
     <>
       <PageHero
         label="Contact"
-        title="Request a Consultation"
+        title="Get a Free Consultation"
         intro="Tell us about your space and requirements. We respond within 24 hours."
         crumb="Contact"
       />
