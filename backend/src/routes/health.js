@@ -6,6 +6,4 @@ router.get("/healthz", (_req, res) => {
   res.json(data);
 });
 var stdin_default = router;
-export {
-  stdin_default as default
-};
+export { stdin_default as default };

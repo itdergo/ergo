@@ -108,7 +108,11 @@ describe("requireRole", () => {
 
   it("accepts any of multiple permitted roles", () => {
     const next = vi.fn();
-    requireRole("admin", "staff")(createReq({ user: { id: "u1", role: "staff" } }), createRes(), next);
+    requireRole("admin", "staff")(
+      createReq({ user: { id: "u1", role: "staff" } }),
+      createRes(),
+      next,
+    );
     expect(next).toHaveBeenCalledOnce();
   });
 });

@@ -9,7 +9,7 @@ router.get("/", cachePublic(120), async (_req, res) => {
   try {
     const result = await db.query.solutions.findMany({
       where: and(eq(solutions.isActive, true), isNull(solutions.deletedAt)),
-      orderBy: [desc(solutions.orderIndex)]
+      orderBy: [desc(solutions.orderIndex)],
     });
     res.json(result);
   } catch (error) {
@@ -39,7 +39,11 @@ router.patch("/:id", requireAuth, requireRole("admin"), async (req, res) => {
       res.status(400).json({ error: "Validation failed", details: parsed.error.issues });
       return;
     }
-    const result = await db.update(solutions).set(parsed.data).where(eq(solutions.id, id)).returning();
+    const result = await db
+      .update(solutions)
+      .set(parsed.data)
+      .where(eq(solutions.id, id))
+      .returning();
     if (result.length === 0) {
       res.status(404).json({ error: "Solution not found" });
       return;
@@ -53,7 +57,11 @@ router.patch("/:id", requireAuth, requireRole("admin"), async (req, res) => {
 router.delete("/:id", requireAuth, requireRole("admin"), async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await db.update(solutions).set({ deletedAt: /* @__PURE__ */ new Date() }).where(and(eq(solutions.id, id), isNull(solutions.deletedAt))).returning();
+    const result = await db
+      .update(solutions)
+      .set({ deletedAt: /* @__PURE__ */ new Date() })
+      .where(and(eq(solutions.id, id), isNull(solutions.deletedAt)))
+      .returning();
     if (result.length === 0) {
       res.status(404).json({ error: "Solution not found" });
       return;
@@ -65,6 +73,4 @@ router.delete("/:id", requireAuth, requireRole("admin"), async (req, res) => {
   }
 });
 var stdin_default = router;
-export {
-  stdin_default as default
-};
+export { stdin_default as default };

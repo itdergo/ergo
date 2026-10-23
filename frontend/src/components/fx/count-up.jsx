@@ -2,14 +2,7 @@ import { jsxs } from "react/jsx-runtime";
 import { useEffect, useRef, useState } from "react";
 import { useInView } from "framer-motion";
 import { useReducedMotion } from "@/lib/site-ui-primitives";
-function CountUp({
-  to,
-  prefix = "",
-  suffix = "",
-  duration = 1.7,
-  decimals = 0,
-  className
-}) {
+function CountUp({ to, prefix = "", suffix = "", duration = 1.7, decimals = 0, className }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-40px" });
   const reduced = useReducedMotion();
@@ -30,12 +23,10 @@ function CountUp({
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, [inView, reduced, to, duration]);
-  return /* @__PURE__ */ jsxs("span", { ref, className, children: [
-    prefix,
-    value.toFixed(decimals),
-    suffix
-  ] });
+  return /* @__PURE__ */ jsxs("span", {
+    ref,
+    className,
+    children: [prefix, value.toFixed(decimals), suffix],
+  });
 }
-export {
-  CountUp
-};
+export { CountUp };

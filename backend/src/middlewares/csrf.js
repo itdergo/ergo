@@ -51,8 +51,4 @@ function validateCsrfToken(req, res, next) {
   next();
 }
 
-export {
-  generateCsrfToken,
-  removeCsrfToken,
-  validateCsrfToken
-};
+export { generateCsrfToken, removeCsrfToken, validateCsrfToken };

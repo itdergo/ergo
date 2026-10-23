@@ -32,7 +32,4 @@ function requireRole(...roles) {
     next();
   };
 }
-export {
-  requireAuth,
-  requireRole
-};
+export { requireAuth, requireRole };

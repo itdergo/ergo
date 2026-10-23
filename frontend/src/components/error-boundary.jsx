@@ -14,20 +14,35 @@ function toError(value) {
   }
 }
 function DefaultFallback({ error, resetError }) {
-  return /* @__PURE__ */ jsx("div", { className: "min-h-screen w-full flex items-center justify-center bg-gray-50 p-6", children: /* @__PURE__ */ jsxs("div", { className: "max-w-lg w-full text-center", children: [
-    /* @__PURE__ */ jsx("h1", { className: "text-xl font-semibold text-gray-900", children: "Something went wrong" }),
-    /* @__PURE__ */ jsx("p", { className: "mt-2 text-sm text-gray-600", children: "This part of the app hit an error. The rest of the app is still running." }),
-    import.meta.env.DEV ? /* @__PURE__ */ jsx("pre", { className: "mt-4 overflow-x-auto rounded bg-gray-100 p-3 text-left text-xs text-gray-800", children: error.message || String(error) }) : null,
-    /* @__PURE__ */ jsx(
-      "button",
-      {
-        type: "button",
-        onClick: resetError,
-        className: "mt-4 rounded bg-gray-900 px-4 py-2 text-sm text-white hover:bg-gray-700",
-        children: "Try again"
-      }
-    )
-  ] }) });
+  return /* @__PURE__ */ jsx("div", {
+    className: "min-h-screen w-full flex items-center justify-center bg-gray-50 p-6",
+    children: /* @__PURE__ */ jsxs("div", {
+      className: "max-w-lg w-full text-center",
+      children: [
+        /* @__PURE__ */ jsx("h1", {
+          className: "text-xl font-semibold text-gray-900",
+          children: "Something went wrong",
+        }),
+        /* @__PURE__ */ jsx("p", {
+          className: "mt-2 text-sm text-gray-600",
+          children: "This part of the app hit an error. The rest of the app is still running.",
+        }),
+        import.meta.env.DEV
+          ? /* @__PURE__ */ jsx("pre", {
+              className:
+                "mt-4 overflow-x-auto rounded bg-gray-100 p-3 text-left text-xs text-gray-800",
+              children: error.message || String(error),
+            })
+          : null,
+        /* @__PURE__ */ jsx("button", {
+          type: "button",
+          onClick: resetError,
+          className: "mt-4 rounded bg-gray-900 px-4 py-2 text-sm text-white hover:bg-gray-700",
+          children: "Try again",
+        }),
+      ],
+    }),
+  });
 }
 class ErrorBoundary extends Component {
   state = { error: null };
@@ -54,6 +69,4 @@ class ErrorBoundary extends Component {
     return /* @__PURE__ */ jsx(Fallback, { error, resetError: this.resetError });
   }
 }
-export {
-  ErrorBoundary
-};
+export { ErrorBoundary };

@@ -1,12 +1,5 @@
 import { jsx } from "react/jsx-runtime";
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  useCallback
-} from "react";
+import { createContext, useContext, useEffect, useMemo, useState, useCallback } from "react";
 import { api } from "@/lib/api";
 const SiteContext = createContext(null);
 function SiteProvider({ children }) {
@@ -24,19 +17,22 @@ function SiteProvider({ children }) {
     Promise.all([
       // Critical path: categories + products loaded in parallel for immediate render
       api.getCategories(),
-      api.getProducts({ status: "active", limit: 100 })
-    ]).then(([cats, prods]) => {
-      setCategories(cats);
-      setProducts(prods.data);
-      setLoading(false);
-    }).catch(() => setLoading(false));
+      api.getProducts({ status: "active", limit: 100 }),
+    ])
+      .then(([cats, prods]) => {
+        setCategories(cats);
+        setProducts(prods.data);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
     const secondaryTimer = setTimeout(() => {
-      Promise.all([api.getIndustries(), api.getSolutions(), api.getResources()]).then(([inds, sols, res]) => {
-        setIndustries(inds);
-        setSolutions(sols);
-        setResources(res);
-      }).catch(() => {
-      });
+      Promise.all([api.getIndustries(), api.getSolutions(), api.getResources()])
+        .then(([inds, sols, res]) => {
+          setIndustries(inds);
+          setSolutions(sols);
+          setResources(res);
+        })
+        .catch(() => {});
     }, 500);
     return () => clearTimeout(secondaryTimer);
   }, []);
@@ -47,13 +43,19 @@ function SiteProvider({ children }) {
   }, [toast]);
   const filteredProducts = useMemo(
     // Memoized filter: products filtered by search query AND selected category
-    () => products.filter((p) => {
-      const q = searchQuery.toLowerCase();
-      const matchesSearch = !searchQuery || p.name.toLowerCase().includes(q) || (p.category?.name ?? "").toLowerCase().includes(q) || (p.shortDescription ?? "").toLowerCase().includes(q) || (p.description ?? "").toLowerCase().includes(q);
-      const matchesCategory = !selectedCategory || p.category?.slug === selectedCategory;
-      return matchesSearch && matchesCategory;
-    }),
-    [products, searchQuery, selectedCategory]
+    () =>
+      products.filter((p) => {
+        const q = searchQuery.toLowerCase();
+        const matchesSearch =
+          !searchQuery ||
+          p.name.toLowerCase().includes(q) ||
+          (p.category?.name ?? "").toLowerCase().includes(q) ||
+          (p.shortDescription ?? "").toLowerCase().includes(q) ||
+          (p.description ?? "").toLowerCase().includes(q);
+        const matchesCategory = !selectedCategory || p.category?.slug === selectedCategory;
+        return matchesSearch && matchesCategory;
+      }),
+    [products, searchQuery, selectedCategory],
   );
   const showToast = useCallback((t) => setToast(t), []);
   const handleSubmit = useCallback(async (event) => {
@@ -66,7 +68,7 @@ function SiteProvider({ children }) {
         company: String(data.get("company") || ""),
         phone: String(data.get("phone") || ""),
         message: String(data.get("message") || ""),
-        source: "website"
+        source: "website",
       });
       setFormStatus("Thank you! Your inquiry has been submitted. We will get back to you soon.");
       setToast({ message: "Inquiry submitted successfully!", type: "success" });
@@ -99,7 +101,7 @@ function SiteProvider({ children }) {
     toast,
     showToast,
     filterCategory,
-    scrollToContact
+    scrollToContact,
   };
   return /* @__PURE__ */ jsx(SiteContext.Provider, { value, children });
 }
@@ -108,7 +110,4 @@ function useSite() {
   if (!ctx) throw new Error("useSite must be used within a SiteProvider");
   return ctx;
 }
-export {
-  SiteProvider,
-  useSite
-};
+export { SiteProvider, useSite };

@@ -4,7 +4,7 @@ const SCRYPT_PARAMS = {
   N: 16384,
   r: 8,
   p: 1,
-  maxmem: 64 * 1024 * 1024
+  maxmem: 64 * 1024 * 1024,
 };
 const KEY_LEN = 64;
 function scryptAsync(password, salt, keylen, opts) {
@@ -33,7 +33,7 @@ async function verifyPassword(password, stored) {
       N: Number(n),
       r: Number(r),
       p: Number(p),
-      maxmem: SCRYPT_PARAMS.maxmem
+      maxmem: SCRYPT_PARAMS.maxmem,
     });
     return derived.length === expected.length && timingSafeEqual(derived, expected);
   } catch {
@@ -53,7 +53,9 @@ if (!JWT_SECRET) {
   throw new Error("JWT_SECRET is required. Set a long random value in the environment.");
 }
 if (JWT_SECRET.length < 32) {
-  throw new Error(`JWT_SECRET is too short (${JWT_SECRET.length} chars). Use at least 32 characters — generate one with: openssl rand -base64 48`);
+  throw new Error(
+    `JWT_SECRET is too short (${JWT_SECRET.length} chars). Use at least 32 characters — generate one with: openssl rand -base64 48`,
+  );
 }
 const SECRET = JWT_SECRET;
 const TOKEN_TTL = process.env["JWT_TTL"] || "8h";
@@ -63,34 +65,27 @@ function signToken(user) {
     sub: user.id,
     email: user.email,
     role: user.role,
-    name: user.name
+    name: user.name,
   };
   return jwt.sign(payload, SECRET, {
     expiresIn: TOKEN_TTL,
-    issuer: ISSUER
+    issuer: ISSUER,
   });
 }
 function verifyToken(token) {
   try {
     const payload = jwt.verify(token, SECRET, {
-      issuer: ISSUER
+      issuer: ISSUER,
     });
     if (!payload.sub) return null;
     return {
       id: String(payload.sub),
       email: String(payload.email ?? ""),
       role: String(payload.role ?? "viewer"),
-      name: String(payload.name ?? "")
+      name: String(payload.name ?? ""),
     };
   } catch {
     return null;
   }
 }
-export {
-  hashPassword,
-  isLegacyHash,
-  signToken,
-  verifyLegacyPassword,
-  verifyPassword,
-  verifyToken
-};
+export { hashPassword, isLegacyHash, signToken, verifyLegacyPassword, verifyPassword, verifyToken };

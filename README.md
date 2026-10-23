@@ -24,17 +24,17 @@ npm run dev
 
 ## Available Scripts
 
-| Script              | Description                                                            |
-| ------------------- | ---------------------------------------------------------------------- |
-| `npm run dev`       | Start concurrently: `npm run dev:api` + `npm run dev:frontend`         |
-| `npm run build`     | Full build: `build:api` + `build:frontend`                             |
-| `npm run verify`    | lint + build (CI gate)                                                 |
-| `npm run seed`      | Seed the database with admin user + categories + products + industries |
-| `npm run db:push`   | Push the Drizzle schema to the database                                |
-| `npm run db:generate`| Generate Drizzle migrations                                           |
-| `npm run test`      | Backend unit + frontend unit + e2e                                     |
-| `npm run lint` / `lint:fix` | ESLint (flat config)                                        |
-| `npm run format`    | Prettier write                                                         |
+| Script                      | Description                                                            |
+| --------------------------- | ---------------------------------------------------------------------- |
+| `npm run dev`               | Start concurrently: `npm run dev:api` + `npm run dev:frontend`         |
+| `npm run build`             | Full build: `build:api` + `build:frontend`                             |
+| `npm run verify`            | lint + build (CI gate)                                                 |
+| `npm run seed`              | Seed the database with admin user + categories + products + industries |
+| `npm run db:push`           | Push the Drizzle schema to the database                                |
+| `npm run db:generate`       | Generate Drizzle migrations                                            |
+| `npm run test`              | Backend unit + frontend unit + e2e                                     |
+| `npm run lint` / `lint:fix` | ESLint (flat config)                                                   |
+| `npm run format`            | Prettier write                                                         |
 
 ## Environment Variables
 

@@ -8,9 +8,9 @@ function createMockReq(ip = "127.0.0.1") {
     connection: { remoteAddress: ip },
     // express-rate-limit calls req.app.get("trust proxy") during validation
     app: {
-      get: (key) => key === "trust proxy" ? false : void 0,
-      set: vi.fn()
-    }
+      get: (key) => (key === "trust proxy" ? false : void 0),
+      set: vi.fn(),
+    },
   };
   return req;
 }
@@ -66,7 +66,7 @@ function createMockRes() {
       }
     },
     writeHead: vi.fn(() => res),
-    setTimeout: vi.fn()
+    setTimeout: vi.fn(),
   };
   return res;
 }

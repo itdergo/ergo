@@ -4,8 +4,8 @@ function routeTask(title, description = "") {
   const tokens = text.split(/[^a-z0-9+]+/).filter(Boolean);
   let best = null;
   for (const employee of AI_EMPLOYEES) {
-    const matched = employee.capabilities.filter(
-      (cap) => tokens.some((t) => t.includes(cap) || cap.includes(t))
+    const matched = employee.capabilities.filter((cap) =>
+      tokens.some((t) => t.includes(cap) || cap.includes(t)),
     );
     const score = matched.length;
     if (!best || score > best.score) {
@@ -17,6 +17,4 @@ function routeTask(title, description = "") {
   }
   return best;
 }
-export {
-  routeTask
-};
+export { routeTask };

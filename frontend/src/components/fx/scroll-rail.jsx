@@ -10,7 +10,7 @@ const SECTIONS = [
   { id: "projects", label: "Projects" },
   { id: "testimonials", label: "Clients" },
   { id: "faq", label: "FAQ" },
-  { id: "contact", label: "Contact" }
+  { id: "contact", label: "Contact" },
 ];
 function ScrollRail() {
   const enabled = useFxEnabled();
@@ -41,18 +41,22 @@ function ScrollRail() {
     };
   }, [enabled]);
   if (!enabled) return null;
-  return /* @__PURE__ */ jsx("nav", { className: "scroll-rail", "aria-label": "Section progress", children: SECTIONS.map((section) => /* @__PURE__ */ jsx(
-    "a",
-    {
-      href: `#${section.id}`,
-      className: `scroll-rail-dot${active === section.id ? " active" : ""}`,
-      "data-label": section.label,
-      "aria-label": `Jump to ${section.label}`,
-      "aria-current": active === section.id ? "true" : void 0
-    },
-    section.id
-  )) });
+  return /* @__PURE__ */ jsx("nav", {
+    className: "scroll-rail",
+    "aria-label": "Section progress",
+    children: SECTIONS.map((section) =>
+      /* @__PURE__ */ jsx(
+        "a",
+        {
+          href: `#${section.id}`,
+          className: `scroll-rail-dot${active === section.id ? " active" : ""}`,
+          "data-label": section.label,
+          "aria-label": `Jump to ${section.label}`,
+          "aria-current": active === section.id ? "true" : void 0,
+        },
+        section.id,
+      ),
+    ),
+  });
 }
-export {
-  ScrollRail
-};
+export { ScrollRail };

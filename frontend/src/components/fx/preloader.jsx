@@ -34,13 +34,24 @@ function Preloader() {
     };
   }, [reduced]);
   if (gone) return null;
-  return /* @__PURE__ */ jsx("div", { className: `preloader${leaving ? " preloader-leaving" : ""}`, "aria-hidden": "true", children: /* @__PURE__ */ jsxs("div", { className: "preloader-inner", children: [
-    /* @__PURE__ */ jsx("div", { className: "preloader-mark", children: "ERGO" }),
-    /* @__PURE__ */ jsx("div", { className: "preloader-sub", children: "Contracts Philippines" }),
-    /* @__PURE__ */ jsx("div", { className: "preloader-track", children: /* @__PURE__ */ jsx("span", { style: { transform: `scaleX(${count / 100})` } }) }),
-    /* @__PURE__ */ jsx("div", { className: "preloader-count", children: count })
-  ] }) });
+  return /* @__PURE__ */ jsx("div", {
+    className: `preloader${leaving ? " preloader-leaving" : ""}`,
+    "aria-hidden": "true",
+    children: /* @__PURE__ */ jsxs("div", {
+      className: "preloader-inner",
+      children: [
+        /* @__PURE__ */ jsx("div", { className: "preloader-mark", children: "ERGO" }),
+        /* @__PURE__ */ jsx("div", {
+          className: "preloader-sub",
+          children: "Contracts Philippines",
+        }),
+        /* @__PURE__ */ jsx("div", {
+          className: "preloader-track",
+          children: /* @__PURE__ */ jsx("span", { style: { transform: `scaleX(${count / 100})` } }),
+        }),
+        /* @__PURE__ */ jsx("div", { className: "preloader-count", children: count }),
+      ],
+    }),
+  });
 }
-export {
-  Preloader
-};
+export { Preloader };

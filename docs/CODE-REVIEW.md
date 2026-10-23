@@ -34,15 +34,15 @@ Overall assessment: **healthy, production-ready with two deployment-blocking bug
 
 ## 3. Architecture Overview
 
-| Layer | Technology |
-|---|---|
-| Frontend | Vite + React 19 (**JSX**) + Tailwind v4 + wouter + framer-motion + lucide-react |
-| Backend | Node + Express 5 (ESM), esbuild bundle → `backend/dist/index.mjs` |
-| Database | Drizzle ORM + **node-postgres (`pg`)** against a real PostgreSQL |
-| Validation | Zod v4 (`drizzle-zod` insert schemas) on all write routes |
-| Auth | JWT (`jsonwebtoken`, HS256) + scrypt password hashing |
-| Infra | Docker (multi-stage), nginx, cPanel `.htaccess`, GitHub Actions CI |
-| Tests | Vitest (unit) + Playwright (e2e) |
+| Layer      | Technology                                                                      |
+| ---------- | ------------------------------------------------------------------------------- |
+| Frontend   | Vite + React 19 (**JSX**) + Tailwind v4 + wouter + framer-motion + lucide-react |
+| Backend    | Node + Express 5 (ESM), esbuild bundle → `backend/dist/index.mjs`               |
+| Database   | Drizzle ORM + **node-postgres (`pg`)** against a real PostgreSQL                |
+| Validation | Zod v4 (`drizzle-zod` insert schemas) on all write routes                       |
+| Auth       | JWT (`jsonwebtoken`, HS256) + scrypt password hashing                           |
+| Infra      | Docker (multi-stage), nginx, cPanel `.htaccess`, GitHub Actions CI              |
+| Tests      | Vitest (unit) + Playwright (e2e)                                                |
 
 Package graph: `frontend` and `backend` → `database`; `backend` → `shared/api-zod`.
 
@@ -71,10 +71,12 @@ Package graph: `frontend` and `backend` → `database`; `backend` → `shared/ap
 ### 🔴 High
 
 #### H1 — No Content-Security-Policy on the public frontend
+
 `infra/nginx.conf` and `infra/cpanel/.htaccess` set `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, and COOP — but **no CSP**. The helmet CSP in `backend/src/app.js` only applies to `/api` responses (JSON, no scripts), so it is effectively inert for the site. The prerendered HTML contains no CSP `<meta>` either.
 
 **Impact:** The public marketing site has no CSP mitigation against XSS/defacement or third-party script injection. This is the single biggest defense-in-depth gap.
 **Fix:** Add a CSP to nginx and `.htaccess` (and a meta fallback for the SPA). Because the prerender injects inline JSON-LD and the analytics script is external, use a **nonce** or **hash**-based `script-src`. Suggested starting point:
+
 ```
 default-src 'self';
 script-src 'self' 'nonce-{RANDOM}' https://plausible.io;
@@ -86,9 +88,11 @@ frame-ancestors 'self';
 base-uri 'self';
 form-action 'self'
 ```
-(Note: the current `scriptSrc: ['self']` in app.js would *block* the Plausible analytics script — confirm intent before enabling.)
+
+(Note: the current `scriptSrc: ['self']` in app.js would _block_ the Plausible analytics script — confirm intent before enabling.)
 
 #### H2 — Upload route path mismatch in deployment configs
+
 The API mounts everything under `/api`, so uploads are served at **`/api/uploads`** (verified: `/uploads` → 404, `/api/uploads/:file` → handler).
 
 - `infra/nginx.conf`: `location /uploads { proxy_pass http://api:5000; }` → requests `api:5000/uploads/...` → **404**.
@@ -102,32 +106,38 @@ The API mounts everything under `/api`, so uploads are served at **`/api/uploads
 ### 🟠 Medium
 
 #### M1 — Admin UI bundled into the public frontend chunk
+
 `frontend/src/App.jsx` imports `AdminPanel` and `LoginPage` **eagerly** (not `React.lazy`), so the entire admin interface ships to every public visitor. Server-side auth is enforced (no data leak), but this inflates the public bundle and discloses admin functionality.
 **Fix:** `React.lazy(() => import("@/components/admin/admin-panel"))` behind the auth gate, with a `<Suspense>` fallback.
 
 #### M2 — JWT stored in `localStorage`
+
 The API client persists the token in `localStorage` (`frontend/src/lib/api.js`). With no CSP (H1) and no XSS sink today, the practical risk is low, but any future stored-XSS would exfiltrate the token.
 **Fix (hardening):** Move to `httpOnly` + `SameSite=Strict` cookies with the existing CSRF middleware; keep the bearer flow only for non-browser clients.
 
 #### M3 — No minimum-strength check on `JWT_SECRET`
-`backend/src/lib/auth.js` only requires that `JWT_SECRET` is *set*. A 6-character secret is accepted and would be brute-forceable.
+
+`backend/src/lib/auth.js` only requires that `JWT_SECRET` is _set_. A 6-character secret is accepted and would be brute-forceable.
 **Fix:** Enforce a minimum length (e.g., ≥ 32 chars) or require a `base64`/`hex` format at startup.
 
 #### M4 — Dead dependencies and unused packages (TS→JS leftovers)
+
 - `@electric-sql/pglite` declared in **both** `backend` and `database` deps — **never imported anywhere** (heavy WASM package).
 - `@ergo/api-client-react` (+ its `@tanstack/react-query` dep) — **never imported**; the frontend uses its own `lib/api.js`.
-- Root `devDependencies`: `typescript`, `@typescript-eslint/eslint-plugin`, `@typescript-eslint/parser` — unused after conversion.
+- Root `devDependencies`: `typescript`, `@typescript-eslint/eslint-plugin`, `@typescript-eslint/parser` — **RETAINED, not dead** (correction to the original finding). `eslint.config.js` uses `@typescript-eslint/parser` to parse `.js`/`.jsx` and `@typescript-eslint/eslint-plugin` for its recommended rules; `typescript` satisfies the parser's peer dependency (no `tsc`/`tsconfig` invokes it directly).
 - `@types/*` in frontend/backend/database/scripts — unused.
 - `tsx` in `scripts` devDeps — unused (seed runs via `node`).
-**Impact:** Slower installs, larger attack surface, confusing dependency graph.
-**Fix:** Remove the unused packages and devDeps; run `npm audit` + `npm run verify` after.
+  **Impact:** Slower installs, larger attack surface, confusing dependency graph.
+  **Fix:** Remove the unused packages and devDeps; run `npm audit` + `npm run verify` after.
 
 #### M5 — Documentation is inaccurate after the conversion
+
 - `README.md`: still says **TypeScript**, lists `npm run typecheck` (removed), `npm run build:libs` (removed), and **"PostgreSQL via PGlite (no external DB required)"** — but the app uses `pg` + a real Postgres (port 5433). PGlite is unused.
 - `docs/ARCHITECTURE.md`: describes a "TypeScript-first monorepo", `tsconfig.json` project references, TanStack Query, and a `typecheck` CI job — all obsolete.
-**Fix:** Update both docs to reflect JavaScript + node-postgres + the current scripts.
+  **Fix:** Update both docs to reflect JavaScript + node-postgres + the current scripts.
 
 #### M6 — `vitest.config.js` exclude references a deleted file
+
 `frontend/vitest.config.js` excludes `**/playwright.config.ts` — should be `.js`. Harmless (the `.js` file is matched by the default include/exclude), but sloppy.
 
 ---
@@ -147,34 +157,34 @@ The API client persists the token in `localStorage` (`frontend/src/lib/api.js`).
 
 ## 6. Prioritized Recommendations
 
-| # | Action | Effort |
-|---|---|---|
-| 1 | Fix the `/uploads` → `/api/uploads` proxy path in nginx + `.htaccess` (H2) | 5 min |
-| 2 | Add a CSP (nonce/hash) to nginx + `.htaccess` (H1) | 30 min |
-| 3 | Remove dead deps/packages: `pglite`, `api-client-react`, `typescript`, `@types/*`, `tsx` (M4) | 20 min |
-| 4 | Update `README.md` + `docs/ARCHITECTURE.md` (M5) | 30 min |
-| 5 | Lazy-load the admin panel (M1) | 15 min |
-| 6 | Enforce `JWT_SECRET` minimum strength (M3) | 10 min |
-| 7 | Add TTL eviction to the CSRF token store (L4) | 20 min |
-| 8 | Add route-level API integration tests (L8) | 1–2 h |
+| #   | Action                                                                                        | Effort |
+| --- | --------------------------------------------------------------------------------------------- | ------ |
+| 1   | Fix the `/uploads` → `/api/uploads` proxy path in nginx + `.htaccess` (H2)                    | 5 min  |
+| 2   | Add a CSP (nonce/hash) to nginx + `.htaccess` (H1)                                            | 30 min |
+| 3   | Remove dead deps/packages: `pglite`, `api-client-react`, `typescript`, `@types/*`, `tsx` (M4) | 20 min |
+| 4   | Update `README.md` + `docs/ARCHITECTURE.md` (M5)                                              | 30 min |
+| 5   | Lazy-load the admin panel (M1)                                                                | 15 min |
+| 6   | Enforce `JWT_SECRET` minimum strength (M3)                                                    | 10 min |
+| 7   | Add TTL eviction to the CSRF token store (L4)                                                 | 20 min |
+| 8   | Add route-level API integration tests (L8)                                                    | 1–2 h  |
 
 ---
 
 ## 7. Verification Snapshot (this review)
 
-| Check | Result |
-|---|---|
-| `npm run verify` (lint + build) | ✅ pass |
-| Unit tests | ✅ 50 pass (40 backend + 10 frontend) |
-| E2E tests | ✅ 20 pass |
-| `npm audit --omit=dev` | ✅ 0 vulnerabilities |
-| Bundle budget | ✅ JS 440.8 KB / CSS 54.4 KB (limits 500 / 120) |
-| axe accessibility | ✅ 0 violations, all routes |
-| Console errors (1440 / 390) | ✅ none |
-| Horizontal overflow (1440 / 390) | ✅ none |
-| Mobile nav | ✅ works |
-| Hardcoded secrets | ✅ none |
-| `.env` tracked in git | ✅ no (only `.env.example`) |
+| Check                            | Result                                          |
+| -------------------------------- | ----------------------------------------------- |
+| `npm run verify` (lint + build)  | ✅ pass                                         |
+| Unit tests                       | ✅ 50 pass (40 backend + 10 frontend)           |
+| E2E tests                        | ✅ 20 pass                                      |
+| `npm audit --omit=dev`           | ✅ 0 vulnerabilities                            |
+| Bundle budget                    | ✅ JS 440.8 KB / CSS 54.4 KB (limits 500 / 120) |
+| axe accessibility                | ✅ 0 violations, all routes                     |
+| Console errors (1440 / 390)      | ✅ none                                         |
+| Horizontal overflow (1440 / 390) | ✅ none                                         |
+| Mobile nav                       | ✅ works                                        |
+| Hardcoded secrets                | ✅ none                                         |
+| `.env` tracked in git            | ✅ no (only `.env.example`)                     |
 
 ---
 
@@ -190,7 +200,7 @@ The following findings were resolved in the continuation pass:
 - **H2 (upload path)** — RESOLVED. Fixed `/uploads` → `/api/uploads` in both nginx and `.htaccess` (and the commented local-port option).
 - **M1 (admin bundle)** — RESOLVED. `LoginPage`/`AdminPanel` are now `React.lazy`-loaded; admin panel is a separate chunk (23.6 KB) and is not in the public bundle.
 - **M3 (JWT secret strength)** — RESOLVED. `backend/src/lib/auth.js` now rejects secrets shorter than 32 chars at startup.
-- **M4 (dead deps)** — RESOLVED. Removed `@electric-sql/pglite` (backend + database), `@ergo/api-client-react` + `@tanstack/react-query`, all `@types/*`, `tsx`, redundant root-level `framer-motion`/`helmet`/`redis`, and the `shared/api-client-react` workspace (deleted). Updated `orval.config.js` and eslint ignores. 159 packages removed.
+- **M4 (dead deps)** — RESOLVED. Removed `@electric-sql/pglite` (backend + database), `@ergo/api-client-react` + `@tanstack/react-query`, all `@types/*`, `tsx`, redundant root-level `framer-motion`/`helmet`/`redis`, and the `shared/api-client-react` workspace (deleted). Updated `orval.config.js` and eslint ignores. 159 packages removed. Note: `typescript` + `@typescript-eslint/eslint-plugin`/`parser` were **retained** (not removed) — `eslint.config.js` uses them as the lint parser for `.js`/`.jsx` (see the M4 correction above).
 - **M5 (docs)** — RESOLVED. Rewrote `README.md` and `docs/ARCHITECTURE.md` to reflect JavaScript + node-postgres + the current scripts.
 - **L4 (CSRF TTL)** — RESOLVED. `csrfTokens` now stores `{ userId, expiresAt }` with a 1h TTL and a periodic unref'd sweep.
 - **L7 (esbuild artifacts)** — partially addressed in `eslint.config.js` (removed stale `@ts-check` and TypeScript references); the transformed source is left as-is for stability.

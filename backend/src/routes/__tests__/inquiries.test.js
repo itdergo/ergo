@@ -82,10 +82,7 @@ describe("POST /api/inquiries (public write)", () => {
   });
 
   it("does not persist an inquiry when validation fails", async () => {
-    await request(app)
-      .post("/api/inquiries")
-      .set("x-csrf-token", csrfToken)
-      .send({ email: "bad" });
+    await request(app).post("/api/inquiries").set("x-csrf-token", csrfToken).send({ email: "bad" });
     expect(mocks.insert).not.toHaveBeenCalled();
   });
 });

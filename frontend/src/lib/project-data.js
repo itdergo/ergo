@@ -8,8 +8,6 @@ const projectFolders = [
   { name: "Mapua", webp: "mapua", image: "mapua.jpg" },
   { name: "NV5", webp: "nv5", image: "nv5.jpg" },
   { name: "SSS", webp: "sss", image: "sss.jpg" },
-  { name: "Suysing", webp: "suysing", image: "suysing.jpg" }
+  { name: "Suysing", webp: "suysing", image: "suysing.jpg" },
 ];
-export {
-  projectFolders
-};
+export { projectFolders };

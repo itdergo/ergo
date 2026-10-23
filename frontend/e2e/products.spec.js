@@ -42,7 +42,7 @@ test.describe("Products Page", () => {
     await expect(page).toHaveURL(/\/products$/);
   });
   test("product card exposes independent View Details and Request Quote actions", async ({
-    page
+    page,
   }) => {
     await page.goto("/products");
     const firstCard = page.locator(".product-card").first();
@@ -61,9 +61,11 @@ test.describe("Products Page", () => {
   });
   test("View Details navigates to the product detail page", async ({ page }) => {
     await page.goto("/products");
-    const viewDetails = page.locator(".product-card a.product-cta", {
-      hasText: "View Details"
-    }).first();
+    const viewDetails = page
+      .locator(".product-card a.product-cta", {
+        hasText: "View Details",
+      })
+      .first();
     await viewDetails.click();
     await expect(page).toHaveURL(/\/products\/[a-z0-9-]+/);
     await expect(page.locator(".product-detail")).toBeVisible();

@@ -10,13 +10,13 @@ var stdin_default = defineConfig({
     viewport: { width: 1280, height: 800 },
     headless: true,
     screenshot: "only-on-failure",
-    trace: "retain-on-failure"
+    trace: "retain-on-failure",
   },
   projects: [
     {
       name: "chromium",
-      use: { browserName: "chromium" }
-    }
+      use: { browserName: "chromium" },
+    },
   ],
   webServer: [
     {
@@ -30,17 +30,15 @@ var stdin_default = defineConfig({
       url: "http://localhost:5000/api/healthz",
       env: { ...process.env, PORT: "5000" },
       reuseExistingServer: !process.env.CI,
-      timeout: 12e4
+      timeout: 12e4,
     },
     {
       command: "npm run dev",
       url: "http://localhost:3000",
       env: { ...process.env, PORT: "3000" },
       reuseExistingServer: !process.env.CI,
-      timeout: 12e4
-    }
-  ]
+      timeout: 12e4,
+    },
+  ],
 });
-export {
-  stdin_default as default
-};
+export { stdin_default as default };

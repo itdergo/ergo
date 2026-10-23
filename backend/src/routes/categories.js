@@ -12,9 +12,9 @@ router.get("/", cachePublic(120), async (_req, res) => {
       orderBy: [desc(categories.orderIndex)],
       with: {
         products: {
-          columns: { id: true, name: true, slug: true, imageUrl: true }
-        }
-      }
+          columns: { id: true, name: true, slug: true, imageUrl: true },
+        },
+      },
     });
     res.json(result);
   } catch (error) {
@@ -27,7 +27,7 @@ router.get("/:slug", cachePublic(120), async (req, res) => {
     const { slug } = req.params;
     const result = await db.query.categories.findFirst({
       where: and(eq(categories.slug, slug), isNull(categories.deletedAt)),
-      with: { products: true }
+      with: { products: true },
     });
     if (!result) {
       res.status(404).json({ error: "Category not found" });
@@ -61,7 +61,11 @@ router.patch("/:id", requireAuth, requireRole("admin"), async (req, res) => {
       res.status(400).json({ error: "Validation failed", details: parsed.error.issues });
       return;
     }
-    const result = await db.update(categories).set({ ...parsed.data, updatedAt: /* @__PURE__ */ new Date() }).where(eq(categories.id, id)).returning();
+    const result = await db
+      .update(categories)
+      .set({ ...parsed.data, updatedAt: /* @__PURE__ */ new Date() })
+      .where(eq(categories.id, id))
+      .returning();
     if (result.length === 0) {
       res.status(404).json({ error: "Category not found" });
       return;
@@ -75,7 +79,11 @@ router.patch("/:id", requireAuth, requireRole("admin"), async (req, res) => {
 router.delete("/:id", requireAuth, requireRole("admin"), async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await db.update(categories).set({ deletedAt: /* @__PURE__ */ new Date() }).where(and(eq(categories.id, id), isNull(categories.deletedAt))).returning();
+    const result = await db
+      .update(categories)
+      .set({ deletedAt: /* @__PURE__ */ new Date() })
+      .where(and(eq(categories.id, id), isNull(categories.deletedAt)))
+      .returning();
     if (result.length === 0) {
       res.status(404).json({ error: "Category not found" });
       return;
@@ -87,6 +95,4 @@ router.delete("/:id", requireAuth, requireRole("admin"), async (req, res) => {
   }
 });
 var stdin_default = router;
-export {
-  stdin_default as default
-};
+export { stdin_default as default };

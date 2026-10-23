@@ -25,9 +25,10 @@ const AI_EMPLOYEES = [
       "test",
       "debug",
       "error",
-      "performance"
+      "performance",
     ],
-    systemPrompt: "You are Dev, the ERGO full-stack software engineer. You write, review, debug, and ship code across the React frontend and Node/Express backend. You think in concrete diffs, tests, and edge cases, and you never ship without verifying builds."
+    systemPrompt:
+      "You are Dev, the ERGO full-stack software engineer. You write, review, debug, and ship code across the React frontend and Node/Express backend. You think in concrete diffs, tests, and edge cases, and you never ship without verifying builds.",
   },
   {
     id: "business-analyst",
@@ -52,9 +53,10 @@ const AI_EMPLOYEES = [
       "forecast",
       "brief",
       "summary",
-      "strategy"
+      "strategy",
     ],
-    systemPrompt: "You are Analyst, the ERGO business analyst. You turn raw data and vague requests into clear requirements, reports, and decisions. You quantify, cite sources, and flag assumptions."
+    systemPrompt:
+      "You are Analyst, the ERGO business analyst. You turn raw data and vague requests into clear requirements, reports, and decisions. You quantify, cite sources, and flag assumptions.",
   },
   {
     id: "customer-support",
@@ -77,9 +79,10 @@ const AI_EMPLOYEES = [
       "onboarding",
       "help",
       "response",
-      "client"
+      "client",
     ],
-    systemPrompt: "You are Support, the ERGO customer-support specialist. You triage inquiries, draft empathetic replies, resolve issues, and keep clients informed. You escalate anything contractual or safety-related to a human."
+    systemPrompt:
+      "You are Support, the ERGO customer-support specialist. You triage inquiries, draft empathetic replies, resolve issues, and keep clients informed. You escalate anything contractual or safety-related to a human.",
   },
   {
     id: "marketing-content",
@@ -102,9 +105,10 @@ const AI_EMPLOYEES = [
       "headline",
       "landing",
       "email",
-      "promotion"
+      "promotion",
     ],
-    systemPrompt: "You are Marketing, the ERGO content and growth specialist. You write clear, on-brand copy, plan campaigns, and optimize for search and conversion. You match the ERGO voice: professional, precise, warm."
+    systemPrompt:
+      "You are Marketing, the ERGO content and growth specialist. You write clear, on-brand copy, plan campaigns, and optimize for search and conversion. You match the ERGO voice: professional, precise, warm.",
   },
   {
     id: "ops-qa",
@@ -128,15 +132,13 @@ const AI_EMPLOYEES = [
       "pipeline",
       "ci",
       "cd",
-      "infrastructure"
+      "infrastructure",
     ],
-    systemPrompt: "You are Ops, the ERGO operations and QA specialist. You verify releases, monitor health, catch regressions, and keep the platform reliable. You are the last line of defence before a change ships."
-  }
+    systemPrompt:
+      "You are Ops, the ERGO operations and QA specialist. You verify releases, monitor health, catch regressions, and keep the platform reliable. You are the last line of defence before a change ships.",
+  },
 ];
 function getEmployee(id) {
   return AI_EMPLOYEES.find((e) => e.id === id);
 }
-export {
-  AI_EMPLOYEES,
-  getEmployee
-};
+export { AI_EMPLOYEES, getEmployee };

@@ -10,22 +10,23 @@ function ResourcesPage() {
     "breadcrumbs",
     breadcrumbs([
       { name: "Home", path: "/" },
-      { name: "Resources", path: "/resources" }
-    ])
+      { name: "Resources", path: "/resources" },
+    ]),
   );
-  return /* @__PURE__ */ jsxs(Fragment, { children: [
-    /* @__PURE__ */ jsx(
-      PageHero,
-      {
+  return /* @__PURE__ */ jsxs(Fragment, {
+    children: [
+      /* @__PURE__ */ jsx(PageHero, {
         label: "Resources & Catalog",
         title: "Brochures & specifications.",
-        intro: "Download our catalogues and product specifications for seating, desking, systems furniture and storage.",
-        crumb: "Resources"
-      }
-    ),
-    /* @__PURE__ */ jsx("div", { className: "page-focus", children: /* @__PURE__ */ jsx(ResourcesSection, {}) })
-  ] });
+        intro:
+          "Download our catalogues and product specifications for seating, desking, systems furniture and storage.",
+        crumb: "Resources",
+      }),
+      /* @__PURE__ */ jsx("div", {
+        className: "page-focus",
+        children: /* @__PURE__ */ jsx(ResourcesSection, {}),
+      }),
+    ],
+  });
 }
-export {
-  ResourcesPage
-};
+export { ResourcesPage };

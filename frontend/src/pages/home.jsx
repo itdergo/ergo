@@ -19,22 +19,22 @@ function HomePage() {
   useJsonLd("organization", ORGANIZATION);
   useJsonLd("localbusiness", LOCAL_BUSINESS);
   useJsonLd("website", WEBSITE);
-  return /* @__PURE__ */ jsxs(Fragment, { children: [
-    /* @__PURE__ */ jsx(ScrollRail, {}),
-    /* @__PURE__ */ jsx(HeroSection, {}),
-    /* @__PURE__ */ jsx(MarqueeBand, {}),
-    /* @__PURE__ */ jsx(AboutSection, {}),
-    /* @__PURE__ */ jsx(ProductsSection, {}),
-    /* @__PURE__ */ jsx(SolutionsSection, {}),
-    /* @__PURE__ */ jsx(IndustriesSection, {}),
-    /* @__PURE__ */ jsx(ProjectsSection, {}),
-    /* @__PURE__ */ jsx(PartnersSection, {}),
-    /* @__PURE__ */ jsx(TestimonialsSection, {}),
-    /* @__PURE__ */ jsx(FaqSection, {}),
-    /* @__PURE__ */ jsx(CtaBanner, {}),
-    /* @__PURE__ */ jsx(ContactSection, {})
-  ] });
+  return /* @__PURE__ */ jsxs(Fragment, {
+    children: [
+      /* @__PURE__ */ jsx(ScrollRail, {}),
+      /* @__PURE__ */ jsx(HeroSection, {}),
+      /* @__PURE__ */ jsx(MarqueeBand, {}),
+      /* @__PURE__ */ jsx(AboutSection, {}),
+      /* @__PURE__ */ jsx(ProductsSection, {}),
+      /* @__PURE__ */ jsx(SolutionsSection, {}),
+      /* @__PURE__ */ jsx(IndustriesSection, {}),
+      /* @__PURE__ */ jsx(ProjectsSection, {}),
+      /* @__PURE__ */ jsx(PartnersSection, {}),
+      /* @__PURE__ */ jsx(TestimonialsSection, {}),
+      /* @__PURE__ */ jsx(FaqSection, {}),
+      /* @__PURE__ */ jsx(CtaBanner, {}),
+      /* @__PURE__ */ jsx(ContactSection, {}),
+    ],
+  });
 }
-export {
-  HomePage
-};
+export { HomePage };

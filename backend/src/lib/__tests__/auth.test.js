@@ -6,7 +6,7 @@ import {
   signToken,
   verifyToken,
   isLegacyHash,
-  verifyLegacyPassword
+  verifyLegacyPassword,
 } from "../auth";
 describe("auth", () => {
   describe("hashPassword", () => {
@@ -49,7 +49,7 @@ describe("auth", () => {
       id: "user-123",
       email: "test@example.com",
       role: "admin",
-      name: "Test User"
+      name: "Test User",
     };
     it("signs a token and verifies it back", () => {
       const token = signToken(testUser);
@@ -68,7 +68,7 @@ describe("auth", () => {
     });
     it("returns null for a token with a malformed payload", () => {
       const header = Buffer.from(JSON.stringify({ alg: "HS256", typ: "JWT" })).toString(
-        "base64url"
+        "base64url",
       );
       const payload = Buffer.from(JSON.stringify({ foo: "bar" })).toString("base64url");
       const token = `${header}.${payload}.fakesig`;

@@ -16,7 +16,4 @@ function useFxEnabled() {
   const fine = useFinePointer();
   return !reduced && fine;
 }
-export {
-  useFinePointer,
-  useFxEnabled
-};
+export { useFinePointer, useFxEnabled };

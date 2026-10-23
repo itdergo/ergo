@@ -9,7 +9,7 @@ router.get("/", cachePublic(120), async (_req, res) => {
   try {
     const result = await db.query.resources.findMany({
       where: and(eq(resources.isActive, true), isNull(resources.deletedAt)),
-      orderBy: [desc(resources.orderIndex)]
+      orderBy: [desc(resources.orderIndex)],
     });
     res.json(result);
   } catch (error) {
@@ -21,7 +21,7 @@ router.get("/:id", cachePublic(120), async (req, res) => {
   try {
     const { id } = req.params;
     const result = await db.query.resources.findFirst({
-      where: and(eq(resources.id, id), isNull(resources.deletedAt))
+      where: and(eq(resources.id, id), isNull(resources.deletedAt)),
     });
     if (!result) {
       res.status(404).json({ error: "Resource not found" });
@@ -55,7 +55,11 @@ router.patch("/:id", requireAuth, requireRole("admin"), async (req, res) => {
       res.status(400).json({ error: "Validation failed", details: parsed.error.issues });
       return;
     }
-    const result = await db.update(resources).set({ ...parsed.data, updatedAt: /* @__PURE__ */ new Date() }).where(eq(resources.id, id)).returning();
+    const result = await db
+      .update(resources)
+      .set({ ...parsed.data, updatedAt: /* @__PURE__ */ new Date() })
+      .where(eq(resources.id, id))
+      .returning();
     if (result.length === 0) {
       res.status(404).json({ error: "Resource not found" });
       return;
@@ -69,7 +73,11 @@ router.patch("/:id", requireAuth, requireRole("admin"), async (req, res) => {
 router.delete("/:id", requireAuth, requireRole("admin"), async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await db.update(resources).set({ deletedAt: /* @__PURE__ */ new Date() }).where(and(eq(resources.id, id), isNull(resources.deletedAt))).returning();
+    const result = await db
+      .update(resources)
+      .set({ deletedAt: /* @__PURE__ */ new Date() })
+      .where(and(eq(resources.id, id), isNull(resources.deletedAt)))
+      .returning();
     if (result.length === 0) {
       res.status(404).json({ error: "Resource not found" });
       return;
@@ -81,6 +89,4 @@ router.delete("/:id", requireAuth, requireRole("admin"), async (req, res) => {
   }
 });
 var stdin_default = router;
-export {
-  stdin_default as default
-};
+export { stdin_default as default };

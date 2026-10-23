@@ -10,22 +10,23 @@ function IndustriesPage() {
     "breadcrumbs",
     breadcrumbs([
       { name: "Home", path: "/" },
-      { name: "Industries", path: "/industries" }
-    ])
+      { name: "Industries", path: "/industries" },
+    ]),
   );
-  return /* @__PURE__ */ jsxs(Fragment, { children: [
-    /* @__PURE__ */ jsx(
-      PageHero,
-      {
+  return /* @__PURE__ */ jsxs(Fragment, {
+    children: [
+      /* @__PURE__ */ jsx(PageHero, {
         label: "Industries",
         title: "Built for the spaces you run.",
-        intro: "ERGO furnishes the environments where people learn, work, gather and recover \u2014 across the Philippines and Southeast Asia.",
-        crumb: "Industries"
-      }
-    ),
-    /* @__PURE__ */ jsx("div", { className: "page-focus", children: /* @__PURE__ */ jsx(IndustriesSection, {}) })
-  ] });
+        intro:
+          "ERGO furnishes the environments where people learn, work, gather and recover \u2014 across the Philippines and Southeast Asia.",
+        crumb: "Industries",
+      }),
+      /* @__PURE__ */ jsx("div", {
+        className: "page-focus",
+        children: /* @__PURE__ */ jsx(IndustriesSection, {}),
+      }),
+    ],
+  });
 }
-export {
-  IndustriesPage
-};
+export { IndustriesPage };

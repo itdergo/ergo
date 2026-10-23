@@ -30,9 +30,12 @@ router.get("/", cachePublic(60), async (req, res) => {
       with: { category: true },
       limit: limitNum,
       offset: offsetNum,
-      orderBy: [desc(products.orderIndex), desc(products.createdAt)]
+      orderBy: [desc(products.orderIndex), desc(products.createdAt)],
     });
-    const total = await db.select({ count: sql`count(*)` }).from(products).where(whereClause);
+    const total = await db
+      .select({ count: sql`count(*)` })
+      .from(products)
+      .where(whereClause);
     res.json({ data: result, total: total[0]?.count || 0, limit: limitNum, offset: offsetNum });
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -44,7 +47,7 @@ router.get("/:slug", cachePublic(60), async (req, res) => {
     const { slug } = req.params;
     const result = await db.query.products.findFirst({
       where: and(eq(products.slug, slug), isNull(products.deletedAt)),
-      with: { category: true }
+      with: { category: true },
     });
     if (!result) {
       res.status(404).json({ error: "Product not found" });
@@ -78,7 +81,11 @@ router.patch("/:id", requireAuth, requireRole("admin"), async (req, res) => {
       res.status(400).json({ error: "Validation failed", details: parsed.error.issues });
       return;
     }
-    const result = await db.update(products).set({ ...parsed.data, updatedAt: /* @__PURE__ */ new Date() }).where(eq(products.id, id)).returning();
+    const result = await db
+      .update(products)
+      .set({ ...parsed.data, updatedAt: /* @__PURE__ */ new Date() })
+      .where(eq(products.id, id))
+      .returning();
     if (result.length === 0) {
       res.status(404).json({ error: "Product not found" });
       return;
@@ -92,7 +99,11 @@ router.patch("/:id", requireAuth, requireRole("admin"), async (req, res) => {
 router.delete("/:id", requireAuth, requireRole("admin"), async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await db.update(products).set({ deletedAt: /* @__PURE__ */ new Date() }).where(and(eq(products.id, id), isNull(products.deletedAt))).returning();
+    const result = await db
+      .update(products)
+      .set({ deletedAt: /* @__PURE__ */ new Date() })
+      .where(and(eq(products.id, id), isNull(products.deletedAt)))
+      .returning();
     if (result.length === 0) {
       res.status(404).json({ error: "Product not found" });
       return;
@@ -104,6 +115,4 @@ router.delete("/:id", requireAuth, requireRole("admin"), async (req, res) => {
   }
 });
 var stdin_default = router;
-export {
-  stdin_default as default
-};
+export { stdin_default as default };

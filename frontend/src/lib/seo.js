@@ -29,7 +29,7 @@ function applySeo({
   description,
   path,
   image = DEFAULT_OG_IMAGE,
-  type = "website"
+  type = "website",
 }) {
   if (typeof document === "undefined") return;
   const url = absoluteUrl(path);
@@ -40,7 +40,7 @@ function applySeo({
   upsertMeta('meta[property="og:title"]', { property: "og:title", content: title });
   upsertMeta('meta[property="og:description"]', {
     property: "og:description",
-    content: description
+    content: description,
   });
   upsertMeta('meta[property="og:url"]', { property: "og:url", content: url });
   upsertMeta('meta[property="og:type"]', { property: "og:type", content: type });
@@ -50,7 +50,7 @@ function applySeo({
   upsertMeta('meta[name="twitter:title"]', { name: "twitter:title", content: title });
   upsertMeta('meta[name="twitter:description"]', {
     name: "twitter:description",
-    content: description
+    content: description,
   });
   upsertMeta('meta[name="twitter:image"]', { name: "twitter:image", content: imageUrl });
 }
@@ -87,5 +87,5 @@ export {
   applySeo,
   metaForPath,
   useJsonLd,
-  useSeo
+  useSeo,
 };

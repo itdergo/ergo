@@ -19,5 +19,5 @@ export {
   ScrollRail,
   ThreeDeck,
   useFinePointer,
-  useFxEnabled
+  useFxEnabled,
 };

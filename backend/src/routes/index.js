@@ -21,6 +21,4 @@ router.use("/auth", authRouter);
 router.use("/uploads", uploadsRouter);
 router.use("/ai", aiRouter);
 var stdin_default = router;
-export {
-  stdin_default as default
-};
+export { stdin_default as default };

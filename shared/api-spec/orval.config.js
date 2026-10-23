@@ -23,8 +23,8 @@ var stdin_default = defineConfig({
     input: {
       target: "./openapi.yaml",
       override: {
-        transformer: titleTransformer
-      }
+        transformer: titleTransformer,
+      },
     },
     output: {
       workspace: apiZodSrc,
@@ -44,15 +44,13 @@ var stdin_default = defineConfig({
             query: ["boolean", "number", "string"],
             param: ["boolean", "number", "string"],
             body: ["bigint", "date"],
-            response: ["bigint", "date"]
-          }
+            response: ["bigint", "date"],
+          },
         },
         useDates: true,
-        useBigInt: true
-      }
-    }
-  }
+        useBigInt: true,
+      },
+    },
+  },
 });
-export {
-  stdin_default as default
-};
+export { stdin_default as default };

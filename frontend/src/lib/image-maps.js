@@ -26,7 +26,7 @@ import {
   Settings,
   ShieldCheck,
   Trash2,
-  Truck
+  Truck,
 } from "lucide-react";
 const iconMap = {
   GraduationCap,
@@ -55,7 +55,7 @@ const iconMap = {
   FolderOpen,
   MessageSquare,
   Settings,
-  BarChart3
+  BarChart3,
 };
 const getIcon = (name, size = 20) => {
   if (!name) return null;
@@ -70,17 +70,12 @@ const industryImages = {
   "BPO & Technology": "industry-bpo.jpg",
   "Banks & Finance": "industry-banks.jpg",
   "Arenas & Stadiums": "industry-arenas.jpg",
-  Academe: "industry-academe.jpg"
+  Academe: "industry-academe.jpg",
 };
 const solutionImages = {
   "After-Sales Support": "solution-after-sales.jpg",
   "Delivery & Installation": "solution-delivery.jpg",
   "Project Management": "solution-project-mgmt.jpg",
-  "Space Planning & Design": "solution-space-planning.jpg"
+  "Space Planning & Design": "solution-space-planning.jpg",
 };
-export {
-  getIcon,
-  iconMap,
-  industryImages,
-  solutionImages
-};
+export { getIcon, iconMap, industryImages, solutionImages };

@@ -21,23 +21,18 @@ function Magnetic({ children, className, strength = 0.32, radius = 24 }) {
     x.set(0);
     y.set(0);
   };
-  return /* @__PURE__ */ jsx(
-    motion.div,
-    {
-      ref,
-      className,
-      onMouseMove: reduced ? void 0 : handleMove,
-      onMouseLeave: reduced ? void 0 : handleLeave,
-      style: {
-        x: reduced ? 0 : springX,
-        y: reduced ? 0 : springY,
-        display: "inline-block",
-        willChange: reduced ? "auto" : "transform"
-      },
-      children
-    }
-  );
+  return /* @__PURE__ */ jsx(motion.div, {
+    ref,
+    className,
+    onMouseMove: reduced ? void 0 : handleMove,
+    onMouseLeave: reduced ? void 0 : handleLeave,
+    style: {
+      x: reduced ? 0 : springX,
+      y: reduced ? 0 : springY,
+      display: "inline-block",
+      willChange: reduced ? "auto" : "transform",
+    },
+    children,
+  });
 }
-export {
-  Magnetic
-};
+export { Magnetic };

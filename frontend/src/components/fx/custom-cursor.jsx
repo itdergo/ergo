@@ -1,7 +1,8 @@
 import { jsx, jsxs } from "react/jsx-runtime";
 import { useEffect, useRef } from "react";
 import { useFxEnabled } from "./hooks";
-const INTERACTIVE = "a, button, input, textarea, select, label, summary, [role='button'], [data-cursor]";
+const INTERACTIVE =
+  "a, button, input, textarea, select, label, summary, [role='button'], [data-cursor]";
 function CustomCursor() {
   const enabled = useFxEnabled();
   const dotRef = useRef(null);
@@ -65,11 +66,18 @@ function CustomCursor() {
     };
   }, [enabled]);
   if (!enabled) return null;
-  return /* @__PURE__ */ jsxs("div", { className: "fx-cursor-layer", "aria-hidden": "true", children: [
-    /* @__PURE__ */ jsx("span", { ref: ringRef, className: "fx-cursor-ring", "data-variant": "default", "data-label": "" }),
-    /* @__PURE__ */ jsx("span", { ref: dotRef, className: "fx-cursor-dot" })
-  ] });
+  return /* @__PURE__ */ jsxs("div", {
+    className: "fx-cursor-layer",
+    "aria-hidden": "true",
+    children: [
+      /* @__PURE__ */ jsx("span", {
+        ref: ringRef,
+        className: "fx-cursor-ring",
+        "data-variant": "default",
+        "data-label": "",
+      }),
+      /* @__PURE__ */ jsx("span", { ref: dotRef, className: "fx-cursor-dot" }),
+    ],
+  });
 }
-export {
-  CustomCursor
-};
+export { CustomCursor };

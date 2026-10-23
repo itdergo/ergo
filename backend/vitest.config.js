@@ -7,10 +7,8 @@ var stdin_default = defineConfig({
     env: {
       JWT_SECRET: "test-secret-key-for-vitest-unit-tests",
       DATABASE_URL: "postgresql://ergo:ergo@localhost:5432/ergo_contracts",
-      REDIS_URL: "redis://localhost:6379"
-    }
-  }
+      REDIS_URL: "redis://localhost:6379",
+    },
+  },
 });
-export {
-  stdin_default as default
-};
+export { stdin_default as default };

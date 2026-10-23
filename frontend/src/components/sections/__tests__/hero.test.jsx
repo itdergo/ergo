@@ -33,19 +33,18 @@ vi.mock("framer-motion", () => {
       h1: createMotion("h1"),
       p: createMotion("p"),
       a: createMotion("a"),
-      img: createMotion("img")
+      img: createMotion("img"),
     },
     useScroll: () => ({ scrollY: 0 }),
     useTransform: (_, __, output) => output[0],
     useSpring: (val) => val,
-    useMotionValue: () => ({ set: () => {
-    } }),
-    useInView: () => true
+    useMotionValue: () => ({ set: () => {} }),
+    useInView: () => true,
   };
 });
 vi.mock("lucide-react", () => ({
   ArrowRight: () => React.createElement("span", { "data-testid": "arrow-right" }),
-  ChevronDown: () => React.createElement("span", { "data-testid": "chevron-down" })
+  ChevronDown: () => React.createElement("span", { "data-testid": "chevron-down" }),
 }));
 import { HeroSection } from "../hero";
 describe("HeroSection", () => {

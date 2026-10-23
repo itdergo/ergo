@@ -17,16 +17,16 @@ app.use(
         return {
           id: req.id,
           method: req.method,
-          url: req.url?.split("?")[0]
+          url: req.url?.split("?")[0],
         };
       },
       res(res) {
         return {
-          statusCode: res.statusCode
+          statusCode: res.statusCode,
         };
-      }
-    }
-  })
+      },
+    },
+  }),
 );
 app.use(
   helmet({
@@ -39,16 +39,21 @@ app.use(
         imgSrc: ["'self'", "data:"],
         scriptSrc: ["'self'"],
         fontSrc: ["'self'", "data:", "https://fonts.gstatic.com"],
-        connectSrc: ["'self'"]
-      }
-    }
-  })
+        connectSrc: ["'self'"],
+      },
+    },
+  }),
 );
 app.use((_req, res, next) => {
   res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
   next();
 });
-const allowedOrigins = (process.env["CORS_ORIGINS"] ?? "http://localhost:3000,http://localhost:5173,http://127.0.0.1:3000").split(",").map((s) => s.trim()).filter(Boolean);
+const allowedOrigins = (
+  process.env["CORS_ORIGINS"] ?? "http://localhost:3000,http://localhost:5173,http://127.0.0.1:3000"
+)
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
 app.use(
   cors({
     // The origin callback is called for every request. If no Origin header is
@@ -61,8 +66,8 @@ app.use(
       }
       callback(null, false);
     },
-    credentials: true
-  })
+    credentials: true,
+  }),
 );
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true, limit: "1mb" }));
@@ -71,20 +76,16 @@ app.use("/api", apiLimiter, router);
 app.use((_req, res) => {
   res.status(404).json({ error: "Not found" });
 });
-app.use(
-  (err, _req, res, next) => {
-    logger.error({ err }, "Unhandled error");
-    if (res.headersSent) {
-      next(err);
-      return;
-    }
-    const status = err.status ?? err.statusCode ?? 500;
-    res.status(status).json({
-      error: status >= 500 ? "Internal server error" : err.message
-    });
+app.use((err, _req, res, next) => {
+  logger.error({ err }, "Unhandled error");
+  if (res.headersSent) {
+    next(err);
+    return;
   }
-);
+  const status = err.status ?? err.statusCode ?? 500;
+  res.status(status).json({
+    error: status >= 500 ? "Internal server error" : err.message,
+  });
+});
 var stdin_default = app;
-export {
-  stdin_default as default
-};
+export { stdin_default as default };

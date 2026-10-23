@@ -7,9 +7,7 @@ var stdin_default = defineConfig({
   dbCredentials: {
     // DATABASE_URL is used when connecting to the database for migrations.
     // "memory://" is a safe fallback that allows generate to run offline.
-    url: process.env.DATABASE_URL || "memory://"
-  }
+    url: process.env.DATABASE_URL || "memory://",
+  },
 });
-export {
-  stdin_default as default
-};
+export { stdin_default as default };

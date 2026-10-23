@@ -22,7 +22,7 @@ class ApiClient {
     const url = `${this.baseUrl}${path}`;
     const headers = {
       "Content-Type": "application/json",
-      ...options.headers
+      ...options.headers,
     };
     if (this.token) {
       headers["Authorization"] = `Bearer ${this.token}`;
@@ -34,7 +34,7 @@ class ApiClient {
     const response = await fetch(url, {
       method: options.method || "GET",
       headers,
-      body: options.body ? JSON.stringify(options.body) : void 0
+      body: options.body ? JSON.stringify(options.body) : void 0,
     });
     if (!response.ok) {
       const error = await response.json().catch(() => ({ error: "Request failed" }));
@@ -109,13 +109,13 @@ class ApiClient {
   createAiTask(data) {
     return this.request("/ai/tasks", {
       method: "POST",
-      body: data
+      body: data,
     });
   }
   updateAiTask(id, data) {
     return this.request(`/ai/tasks/${id}`, {
       method: "PATCH",
-      body: data
+      body: data,
     });
   }
   deleteAiTask(id) {
@@ -126,13 +126,10 @@ class ApiClient {
     return this.request("/auth/me");
   }
   async login(email, password) {
-    const res = await this.request(
-      "/auth/login",
-      {
-        method: "POST",
-        body: { email, password }
-      }
-    );
+    const res = await this.request("/auth/login", {
+      method: "POST",
+      body: { email, password },
+    });
     if (res.csrfToken) {
       this.setCsrfToken(res.csrfToken);
     }
@@ -141,11 +138,9 @@ class ApiClient {
   register(data) {
     return this.request("/auth/register", {
       method: "POST",
-      body: data
+      body: data,
     });
   }
 }
 const api = new ApiClient(API_BASE);
-export {
-  api
-};
+export { api };

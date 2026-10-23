@@ -8,7 +8,7 @@ import {
   timestamp,
   jsonb,
   pgEnum,
-  serial
+  serial,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
@@ -20,7 +20,7 @@ const inquiryStatusEnum = pgEnum("inquiry_status", [
   "proposal",
   "won",
   "lost",
-  "archived"
+  "archived",
 ]);
 const productStatusEnum = pgEnum("product_status", ["active", "draft", "archived"]);
 const users = pgTable("users", {
@@ -32,7 +32,7 @@ const users = pgTable("users", {
   isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-  deletedAt: timestamp("deleted_at")
+  deletedAt: timestamp("deleted_at"),
 });
 const categories = pgTable("categories", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -44,7 +44,7 @@ const categories = pgTable("categories", {
   isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-  deletedAt: timestamp("deleted_at")
+  deletedAt: timestamp("deleted_at"),
 });
 const products = pgTable("products", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -65,7 +65,7 @@ const products = pgTable("products", {
   isFeatured: boolean("is_featured").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-  deletedAt: timestamp("deleted_at")
+  deletedAt: timestamp("deleted_at"),
 });
 const inquiries = pgTable("inquiries", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -81,7 +81,7 @@ const inquiries = pgTable("inquiries", {
   source: varchar("source", { length: 50 }).default("website"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-  deletedAt: timestamp("deleted_at")
+  deletedAt: timestamp("deleted_at"),
 });
 const resources = pgTable("resources", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -93,7 +93,7 @@ const resources = pgTable("resources", {
   isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-  deletedAt: timestamp("deleted_at")
+  deletedAt: timestamp("deleted_at"),
 });
 const industries = pgTable("industries", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -103,7 +103,7 @@ const industries = pgTable("industries", {
   orderIndex: integer("order_index").default(0).notNull(),
   isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  deletedAt: timestamp("deleted_at")
+  deletedAt: timestamp("deleted_at"),
 });
 const solutions = pgTable("solutions", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -113,7 +113,7 @@ const solutions = pgTable("solutions", {
   orderIndex: integer("order_index").default(0).notNull(),
   isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  deletedAt: timestamp("deleted_at")
+  deletedAt: timestamp("deleted_at"),
 });
 const auditLogs = pgTable("audit_logs", {
   id: serial("id").primaryKey(),
@@ -122,7 +122,7 @@ const auditLogs = pgTable("audit_logs", {
   entityType: text("entity_type").notNull(),
   entityId: integer("entity_id"),
   details: jsonb("details"),
-  createdAt: timestamp("created_at").defaultNow().notNull()
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 const aiTasks = pgTable("ai_tasks", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -133,43 +133,43 @@ const aiTasks = pgTable("ai_tasks", {
   result: text("result"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-  completedAt: timestamp("completed_at")
+  completedAt: timestamp("completed_at"),
 });
 const categoriesRelations = relations(categories, ({ many }) => ({
-  products: many(products)
+  products: many(products),
 }));
 const productsRelations = relations(products, ({ one }) => ({
   category: one(categories, {
     fields: [products.categoryId],
-    references: [categories.id]
-  })
+    references: [categories.id],
+  }),
 }));
 const usersRelations = relations(users, ({ many }) => ({
-  inquiries: many(inquiries)
+  inquiries: many(inquiries),
 }));
 const inquiriesRelations = relations(inquiries, ({ one }) => ({
   assignedTo: one(users, {
     fields: [inquiries.assignedTo],
-    references: [users.id]
-  })
+    references: [users.id],
+  }),
 }));
 const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
-  deletedAt: true
+  deletedAt: true,
 });
 const insertCategorySchema = createInsertSchema(categories).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
-  deletedAt: true
+  deletedAt: true,
 });
 const insertProductSchema = createInsertSchema(products).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
-  deletedAt: true
+  deletedAt: true,
 });
 const insertInquirySchema = createInsertSchema(inquiries).omit({
   id: true,
@@ -181,23 +181,23 @@ const insertInquirySchema = createInsertSchema(inquiries).omit({
   // Internal notes are not client-editable
   createdAt: true,
   updatedAt: true,
-  deletedAt: true
+  deletedAt: true,
 });
 const insertResourceSchema = createInsertSchema(resources).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
-  deletedAt: true
+  deletedAt: true,
 });
 const insertIndustrySchema = createInsertSchema(industries).omit({
   id: true,
   createdAt: true,
-  deletedAt: true
+  deletedAt: true,
 });
 const insertSolutionSchema = createInsertSchema(solutions).omit({
   id: true,
   createdAt: true,
-  deletedAt: true
+  deletedAt: true,
 });
 const insertAiTaskSchema = createInsertSchema(aiTasks).omit({
   id: true,
@@ -207,7 +207,7 @@ const insertAiTaskSchema = createInsertSchema(aiTasks).omit({
   result: true,
   createdAt: true,
   updatedAt: true,
-  completedAt: true
+  completedAt: true,
 });
 export {
   aiTasks,
@@ -233,5 +233,5 @@ export {
   solutions,
   userRoleEnum,
   users,
-  usersRelations
+  usersRelations,
 };

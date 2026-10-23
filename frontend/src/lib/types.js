@@ -6,7 +6,11 @@ const webpAsset = (file) => {
   return `${import.meta.env.BASE_URL}images/webp/${dir}${stem}`;
 };
 const webpLogo = (file) => {
-  const slug = file.replace(/\.(jpg|jpeg|png)$/i, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const slug = file
+    .replace(/\.(jpg|jpeg|png)$/i, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
   return `${import.meta.env.BASE_URL}images/webp/partners/${slug}-400.webp`;
 };
 const srcSet = (file) => {
@@ -15,9 +19,4 @@ const srcSet = (file) => {
   const base = webpAsset(file);
   return rungs.map((w) => `${base}-${w}.webp ${w}w`).join(", ");
 };
-export {
-  asset,
-  srcSet,
-  webpAsset,
-  webpLogo
-};
+export { asset, srcSet, webpAsset, webpLogo };

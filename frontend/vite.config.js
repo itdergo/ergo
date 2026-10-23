@@ -25,9 +25,9 @@ var stdin_default = defineConfig({
         background_color: "#ffffff",
         display: "standalone",
         // Build output to dist/public for backend static serving
-        icons: [{ src: "/images/ergo-logo.jpg", sizes: "512x512", type: "image/jpeg" }]
-      }
-    })
+        icons: [{ src: "/images/ergo-logo.jpg", sizes: "512x512", type: "image/jpeg" }],
+      },
+    }),
   ],
   resolve: {
     alias: {
@@ -35,16 +35,16 @@ var stdin_default = defineConfig({
       "@": path.resolve(import.meta.dirname, "src"),
       // @assets maps to the attached_assets directory (outside src)
       // Dev proxy: /api requests forwarded to backend on port 5000
-      "@assets": path.resolve(import.meta.dirname, "..", "attached_assets")
+      "@assets": path.resolve(import.meta.dirname, "..", "attached_assets"),
     },
     // Ensure only one copy of React is loaded
-    dedupe: ["react", "react-dom"]
+    dedupe: ["react", "react-dom"],
   },
   root: path.resolve(import.meta.dirname),
   build: {
     // Output to dist/public — nginx serves this directory in production
     outDir: path.resolve(import.meta.dirname, "dist/public"),
-    emptyOutDir: true
+    emptyOutDir: true,
   },
   server: {
     port,
@@ -53,22 +53,20 @@ var stdin_default = defineConfig({
     allowedHosts: true,
     fs: {
       // Prevent serving files outside the project root
-      strict: true
+      strict: true,
     },
     proxy: {
       // Proxy API requests to the backend during development
       "/api": {
         target: "http://localhost:5000",
-        changeOrigin: true
-      }
-    }
+        changeOrigin: true,
+      },
+    },
   },
   preview: {
     port,
     host: "0.0.0.0",
-    allowedHosts: true
-  }
+    allowedHosts: true,
+  },
 });
-export {
-  stdin_default as default
-};
+export { stdin_default as default };

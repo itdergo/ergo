@@ -10,22 +10,22 @@ function ContactPage() {
     "breadcrumbs",
     breadcrumbs([
       { name: "Home", path: "/" },
-      { name: "Contact", path: "/contact" }
-    ])
+      { name: "Contact", path: "/contact" },
+    ]),
   );
-  return /* @__PURE__ */ jsxs(Fragment, { children: [
-    /* @__PURE__ */ jsx(
-      PageHero,
-      {
+  return /* @__PURE__ */ jsxs(Fragment, {
+    children: [
+      /* @__PURE__ */ jsx(PageHero, {
         label: "Contact",
         title: "Get a Free Consultation",
         intro: "Tell us about your space and requirements. We respond within 24 hours.",
-        crumb: "Contact"
-      }
-    ),
-    /* @__PURE__ */ jsx("div", { className: "page-focus", children: /* @__PURE__ */ jsx(ContactSection, {}) })
-  ] });
+        crumb: "Contact",
+      }),
+      /* @__PURE__ */ jsx("div", {
+        className: "page-focus",
+        children: /* @__PURE__ */ jsx(ContactSection, {}),
+      }),
+    ],
+  });
 }
-export {
-  ContactPage
-};
+export { ContactPage };

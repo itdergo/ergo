@@ -6,7 +6,7 @@ const mocks = vi.hoisted(() => ({
   keys: vi.fn(),
   quit: vi.fn(),
   connect: vi.fn(),
-  on: vi.fn()
+  on: vi.fn(),
 }));
 vi.mock("redis", () => ({
   createClient: vi.fn(() => ({
@@ -17,8 +17,8 @@ vi.mock("redis", () => ({
     quit: mocks.quit,
     connect: mocks.connect,
     on: mocks.on,
-    isOpen: true
-  }))
+    isOpen: true,
+  })),
 }));
 describe("redis cache", () => {
   beforeEach(() => {
@@ -57,7 +57,7 @@ describe("redis cache", () => {
       const { cacheSet } = await import("../redis");
       await cacheSet("test-key", { id: 1 }, 120);
       expect(mocks.set).toHaveBeenCalledWith("test-key", JSON.stringify({ id: 1 }), {
-        EX: 120
+        EX: 120,
       });
     });
     it("uses default TTL of 60 seconds", async () => {
@@ -65,7 +65,7 @@ describe("redis cache", () => {
       const { cacheSet } = await import("../redis");
       await cacheSet("test-key", { id: 1 });
       expect(mocks.set).toHaveBeenCalledWith("test-key", JSON.stringify({ id: 1 }), {
-        EX: 60
+        EX: 60,
       });
     });
     it("does not throw on Redis error", async () => {

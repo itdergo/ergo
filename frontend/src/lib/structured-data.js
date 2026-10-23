@@ -7,15 +7,16 @@ const ORGANIZATION = {
   alternateName: "ERGO Contracts",
   url: SITE_URL,
   logo: absoluteUrl("/images/ergo-logo.jpg"),
-  description: "Ergonomic furniture and workplace solutions for offices, institutions, and homes across the Philippines and Southeast Asia.",
+  description:
+    "Ergonomic furniture and workplace solutions for offices, institutions, and homes across the Philippines and Southeast Asia.",
   areaServed: ["PH", "SEA"],
   contactPoint: {
     "@type": "ContactPoint",
     contactType: "sales",
     telephone: "+63-2-8843-1177",
     email: "sales_ergo@ergo.com.ph",
-    availableLanguage: ["en", "fil"]
-  }
+    availableLanguage: ["en", "fil"],
+  },
 };
 const LOCAL_BUSINESS = {
   "@context": "https://schema.org",
@@ -35,22 +36,22 @@ const LOCAL_BUSINESS = {
     addressLocality: "Makati City",
     addressRegion: "Metro Manila",
     postalCode: "1200",
-    addressCountry: "PH"
+    addressCountry: "PH",
   },
   geo: {
     "@type": "GeoCoordinates",
     latitude: 14.5529,
-    longitude: 121.0077
+    longitude: 121.0077,
   },
   openingHoursSpecification: [
     {
       "@type": "OpeningHoursSpecification",
       dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
       opens: "08:00",
-      closes: "18:00"
-    }
+      closes: "18:00",
+    },
   ],
-  areaServed: ["Metro Manila", "Philippines", "Southeast Asia"]
+  areaServed: ["Metro Manila", "Philippines", "Southeast Asia"],
 };
 const WEBSITE = {
   "@context": "https://schema.org",
@@ -59,7 +60,7 @@ const WEBSITE = {
   name: "ERGO Contracts Philippines",
   url: SITE_URL,
   publisher: { "@id": `${SITE_URL}/#organization` },
-  inLanguage: "en-PH"
+  inLanguage: "en-PH",
 };
 function breadcrumbs(items) {
   return {
@@ -69,8 +70,8 @@ function breadcrumbs(items) {
       "@type": "ListItem",
       position: i + 1,
       name: it.name,
-      item: absoluteUrl(it.path)
-    }))
+      item: absoluteUrl(it.path),
+    })),
   };
 }
 function itemList(name, items) {
@@ -83,8 +84,8 @@ function itemList(name, items) {
       "@type": "ListItem",
       position: i + 1,
       name: it.name,
-      url: absoluteUrl(it.path)
-    }))
+      url: absoluteUrl(it.path),
+    })),
   };
 }
 function productSchema(p) {
@@ -93,17 +94,12 @@ function productSchema(p) {
     "@type": "Product",
     name: p.name,
     description: p.shortDescription || p.description || void 0,
-    ...p.imageUrl ? { image: p.imageUrl.startsWith("http") ? p.imageUrl : absoluteUrl(p.imageUrl) } : {},
-    ...p.categoryName ? { category: p.categoryName } : {},
+    ...(p.imageUrl
+      ? { image: p.imageUrl.startsWith("http") ? p.imageUrl : absoluteUrl(p.imageUrl) }
+      : {}),
+    ...(p.categoryName ? { category: p.categoryName } : {}),
     brand: { "@type": "Brand", name: "ERGO Contracts Philippines" },
-    url: absoluteUrl(`/products/${p.slug}`)
+    url: absoluteUrl(`/products/${p.slug}`),
   };
 }
-export {
-  LOCAL_BUSINESS,
-  ORGANIZATION,
-  WEBSITE,
-  breadcrumbs,
-  itemList,
-  productSchema
-};
+export { LOCAL_BUSINESS, ORGANIZATION, WEBSITE, breadcrumbs, itemList, productSchema };

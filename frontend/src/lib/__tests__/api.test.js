@@ -11,7 +11,7 @@ describe("api client", () => {
   it("adds Authorization header when token is set", async () => {
     const mockFetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({ user: { id: "1" } })
+      json: async () => ({ user: { id: "1" } }),
     });
     vi.stubGlobal("fetch", mockFetch);
     localStorage.setItem("auth_token", "test-token-123");
@@ -24,7 +24,7 @@ describe("api client", () => {
   it("does not add Authorization header when token is not set", async () => {
     const mockFetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({ data: [] })
+      json: async () => ({ data: [] }),
     });
     vi.stubGlobal("fetch", mockFetch);
     const { api } = await import("../api");
@@ -36,7 +36,7 @@ describe("api client", () => {
   it("includes Content-Type header", async () => {
     const mockFetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({})
+      json: async () => ({}),
     });
     vi.stubGlobal("fetch", mockFetch);
     const { api } = await import("../api");

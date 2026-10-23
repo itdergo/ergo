@@ -68,11 +68,4 @@ async function closeRedis() {
     client = null;
   }
 }
-export {
-  cacheAside,
-  cacheDel,
-  cacheGet,
-  cacheSet,
-  closeRedis,
-  redisEnabled
-};
+export { cacheAside, cacheDel, cacheGet, cacheSet, closeRedis, redisEnabled };
